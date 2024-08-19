@@ -794,8 +794,8 @@ ion-card.logOutCard{--background:#FFF3EB !important;
           text-align: center;
           margin: 0rem;
         //   color: #F29200;
-          color:var( --ion-color-light) !important;
-          text-shadow:4px 2px 4px #6D2F2361;
+          color:var( --ion-color-secondary) !important;
+          //text-shadow:4px 2px 4px #6D2F2361;
       }
 
       h5 {
@@ -805,7 +805,8 @@ ion-card.logOutCard{--background:#FFF3EB !important;
           display: block;
           text-align: center;
           margin-top: 0.15rem;
-          text-transform: uppercase;
+          padding-bottom: 5px;
+          //text-transform: uppercase;
       }
   }
 
@@ -899,7 +900,7 @@ ion-card.logOutCard{--background:#FFF3EB !important;
 
 
 .previewBts {
-  margin-top: -24px;
+  margin-top: 10px;
 
   ion-button {
       margin-left: 10px;
@@ -1386,7 +1387,7 @@ ion-card.logOutCard{--background:#FFF3EB !important;
 
 .headerBts {
 
-
+margin-top: 10px;
   ion-button {
       margin-left: 10px;
       --background: #fff;
@@ -1523,7 +1524,7 @@ ion-card.logOutCard{--background:#FFF3EB !important;
 }
 
 .previewBts {
-  margin-top: -24px;
+  margin-top: 10px;
 
   ion-button {
       margin-left: 10px;

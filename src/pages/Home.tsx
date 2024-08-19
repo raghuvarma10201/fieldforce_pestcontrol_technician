@@ -23,6 +23,7 @@ import Db from "../data/offline/entity/Db"; // Import allFunction from Db
 import { syncPush } from "../data/offline/entity/sync-push";
 import { ellipse } from "ionicons/icons";
 import {toast} from "react-toastify";
+import NotificationLength from "../components/NotificationLength";
 // import {getTaskListByStatus} from '../data/offline/entity/DataRetriever';
 //  import {taskListFetcher} from "../data/offline/entity/DataRetriever";
 
@@ -160,10 +161,7 @@ const Home: React.FC = () => {
             <IonItem lines="none">
               <IonImg className="logoMd ion-float-start" src="assets/images/logo-sm-white.svg"/>
                   <div className="headerBts" slot="end">
-                      <IonButton className="notificationsIcon" shape="round" onClick={handleNotificationClick}>
-                        <IonImg src="assets/images/notifications-icon.svg" />
-                        <IonIcon className="alertNotifi" icon={ellipse}></IonIcon>
-                      </IonButton>
+                        <NotificationLength/>
                         <IonButton shape="round" routerLink={"/profile"}>
                           <IonImg src="assets/images/account-user.svg" />
                         </IonButton>

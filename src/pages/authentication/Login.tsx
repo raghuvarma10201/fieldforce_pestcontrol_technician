@@ -26,7 +26,7 @@ import { eye, eyeOff } from "ionicons/icons"; // Import icons
 
 
 const Login: React.FC = () => {
-  const logo = "assets/images/psd-logo.svg";
+  const logo = "assets/images/logo-login.svg";
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginMessage, setLoginMessage] = useState("");
@@ -170,18 +170,20 @@ const Login: React.FC = () => {
           </IonText>
           <form onSubmit={handleLogin}>
             <IonLabel className="ion-label">Email / Employee ID</IonLabel>
-            <IonItem lines="none">
+            <div className="ionItemInput ion-margin-bottom">  
+            <IonImg className="loginImgInput" src="assets/images/login-email-icon.svg"></IonImg>     
               <IonInput
                 placeholder="Email"
                 value={username}
                 onIonInput={handleUsernameChange}
-               
+                style={{ color: "black" }}
               />
-            </IonItem>
+            </div>
             {usernameError && <IonText color="danger">{usernameError}</IonText>}
 
             <IonLabel className="ion-label">Password</IonLabel>
-            <IonItem lines="none">
+            <div className="ionItemInput">  
+            <IonImg className="loginImgInput" src="assets/images/login-password-icon.svg"></IonImg>    
               <IonInput
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
@@ -189,13 +191,13 @@ const Login: React.FC = () => {
                 onIonInput={handlePasswordChange}
                 style={{ color: "black" }}
               />
-              <IonIcon
+              <IonIcon className="showPasswordIcon"
                 slot="end"
                 icon={showPassword ? eye : eyeOff}
                 onClick={togglePasswordVisibility}
-                style={{ cursor: "pointer", marginRight: "10px" }}
+                style={{ cursor: "pointer",}}
               />
-            </IonItem>
+            </div>
             {passwordError && <IonText color="danger">{passwordError}</IonText>}
 
             <IonText className="ion-Remember">
@@ -210,7 +212,7 @@ const Login: React.FC = () => {
             </IonText>
             <IonButton
               type="submit"
-              className="ion-button"
+              className="ion-button primaryGradientBt"
               slot="primary"
               fill="solid"
               expand="block"

@@ -17,6 +17,7 @@ import {
   IonLoading,
   IonAlert,
   IonBadge,
+  IonLabel,
 } from "@ionic/react";
 import { useParams, useHistory } from "react-router-dom";
 import { ellipse, sync, time } from "ionicons/icons";
@@ -33,6 +34,7 @@ import NotificationLength from "../components/NotificationLength";
 
 const Dashboard: React.FC = () => {
   const { taskId } = useParams<{ taskId: string }>();
+  const [userData, setUserData] = useState<any>(null);
   const [totalTasks, setTotalTasks] = useState<number>(0);
   const [completedTasks, setCompletedTasks] = useState<number>(0);
   const [expiredTasks, setExpiredTasks] = useState<number>(0);
@@ -41,6 +43,11 @@ const Dashboard: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
+    const userDataString = localStorage.getItem("userData");
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      setUserData(userData);
+    }
     visitStatusCount()
       .then((response) => {
         if (response && response.success) {
@@ -163,91 +170,85 @@ const Dashboard: React.FC = () => {
     <>
       <IonContent className="dashboardWrapp ionContentColor ">
         <div className="homeHeader">
-                <IonItem lines="none">
-                  <IonImg
-                    className="logoMd ion-float-start"
-                    src="assets/images/logo-sm-white.svg"
-                  />
-                  <div className="headerBts" slot="end">
-                    <IonButton
-                      className="notificationsIcon"
-                      shape="round"
-                      onClick={handleNotificationClick}
-                    >
-                      <IonImg src="assets/images/notifications-icon.svg" />
-                      <IonIcon className="alertNotifi" icon={ellipse}></IonIcon>
-                    </IonButton>
-                    <IonButton shape="round" routerLink={"/profile"}>
-                      <IonImg src="assets/images/account-user.svg" />
-                    </IonButton>
-                  </div>
-                </IonItem>
+          <IonItem lines="none">
+            <IonImg
+              className="logoMd ion-float-start"
+              src="assets/images/logo-sm-white.svg"
+            />
+            <div className="headerBts" slot="end">
+              <NotificationLength/>
+              <IonButton shape="round" routerLink={"/profile"}>
+                <IonImg src="assets/images/account-user.svg" />
+              </IonButton>
+            </div>
+          </IonItem>
 
-              <IonText className="welcomeText">
-                <h2>Welcome !</h2>
-                <h1>Technician Dashboard</h1>
-              </IonText>
+          <IonText className="welcomeText">
+            <h2>Welcome !</h2>
+            <h1> {userData?.first_name} {userData?.last_name}</h1>
+            <h6>{userData?.role_name}</h6>
+          </IonText>
 
-              <div className="totalTasks">
-                <IonRow>
-                  <IonCol size="4" className="ion-borderRightDash">
-                    <IonCard>
-                      <IonText>
-                        <h3>{totalTasks}</h3>
-                      </IonText>
-                      <IonText>
-                        <h5>Total Tasks</h5>
-                      </IonText>
-                    </IonCard>
-                  </IonCol>
-                  <IonCol size="4" className="ion-borderRightDash">
-                    <IonCard >
-                      <IonText>
-                        <h3 className="completedColor">{completedTasks}</h3>
-                      </IonText>
-                      <IonText>
-                        <h5>Completed</h5>
-                      </IonText>
-                    </IonCard>
-                  </IonCol>
-                  <IonCol size="4">
-                    <IonCard>
-                      <IonText>
-                        <h3 className="expiredcolor">{expiredTasks}</h3>
-                      </IonText>
-                      <IonText>
-                        <h5>Expired</h5>
-                      </IonText>
-                    </IonCard>
-                  </IonCol>
-                </IonRow>
-              </div>
+          <div className="totalTasks">
+            <IonRow>
+              <IonCol size="4" className="ion-borderRightDash">
+                <IonCard>
+                  <IonText>
+                    <h3>{totalTasks}</h3>
+                  </IonText>
+                  <IonText>
+                    <h5>Total Tasks</h5>
+                  </IonText>
+                </IonCard>
+              </IonCol>
+              <IonCol size="4" className="ion-borderRightDash">
+                <IonCard >
+                  <IonText>
+                    <h3 className="completedColor">{completedTasks}</h3>
+                  </IonText>
+                  <IonText>
+                    <h5>Completed</h5>
+                  </IonText>
+                </IonCard>
+              </IonCol>
+              <IonCol size="4">
+                <IonCard>
+                  <IonText>
+                    <h3 className="expiredcolor">{expiredTasks}</h3>
+                  </IonText>
+                  <IonText>
+                    <h5>Expired</h5>
+                  </IonText>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          </div>
 
         </div>
 
-       
+
         <div className="homeList ion-padding-horizontal">
-          
+
           <IonRow>
             {menuList.length > 0
               ? menuList.map((item: any, index: any) => {
-                  const { path, icon, title, onClick } = item;
-                  return path === "sync" ? (
-                    <IonCol key={index} size="4">
-                       <IonCard>
+                const { path, icon, title, onClick } = item;
+                return path === "sync" ? (
+                  <IonCol key={index} size="4">
+                    <IonCard>
                       <Db />
-                      </IonCard>
-                    </IonCol>
-                  ) : (
-                    <MenuAction
-                      key={index}
-                      path={path}
-                      icon={icon}
-                      title={title}
-                      onClick={onClick}
-                    />
-                  );
-                })
+                    </IonCard>
+                  </IonCol>
+                ) : (
+                  <MenuAction
+                    key={index}
+                    path={path}
+                    icon={icon}
+                    title={title}
+                    onClick={onClick}
+                  />
+                );
+              })
               : "No Data"}
           </IonRow>
         </div>
@@ -255,7 +256,7 @@ const Dashboard: React.FC = () => {
         <div className="checkInFooter">
           <IonItem lines="none">
             {/* <IonImg src="assets/images/time-icon.svg"></IonImg> */}
-            <IonIcon icon={time}></IonIcon>        
+            <IonIcon icon={time}></IonIcon>
             <IonText>
               <NetworkCheckTime />
             </IonText>
@@ -263,6 +264,21 @@ const Dashboard: React.FC = () => {
         </div>
 
       </IonContent>
+      <IonFooter className="ion-footer onGoingTask">
+        <IonToolbar>
+
+
+          <div className="ion-float-start" slot="start">
+            <h2>Flying Insect Control Flying Insect Control</h2>
+            <IonLabel>Reference Number <span>PCS240805173403</span></IonLabel>
+          </div>
+
+          <div className="ion-float-end statusBlock" slot="end">
+            <IonLabel>Status  <span>Ongoing <IonImg className="ion-float-right" src="assets/images/arrow-forward-w.svg"></IonImg></span></IonLabel>
+          </div>
+
+        </IonToolbar>
+      </IonFooter>
       <IonLoading
         isOpen={loading}
         message={"Syncing up data to server..."}

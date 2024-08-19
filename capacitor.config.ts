@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'ae.rak.pestcontrol.technician.app',
+  appId: 'com.fieldforce.technician.app',
   appName: 'Pest Control Technician App',
   webDir: 'dist',
   server: {

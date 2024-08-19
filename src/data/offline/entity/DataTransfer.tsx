@@ -1267,115 +1267,6 @@ export const savePestWorkdoneBasedOnNetwork = async (
   }
 };
 
-//////////////////////////////
-// export const updateInterval = async (visitId:any, isPaused:any) => {
-//   const userData = getUserData();
-//   const pos = await getCurrentLocation();
-//   if (!pos) {
-//     console.error("Error fetching Location");
-//     throw new Error("Failed to fetch Location");
-//   }
-
-//   const currTime = getDateTime();
-//   const formattedCurrTime = formatToUaeTime(currTime);
-//   const type = isPaused ? "Resume" : "Break";
-
-//   try {
-//     // GET NETWORK STATUS
-//     const nwStatus = await Network.getStatus();
-//     console.log("NETWORK OVERALL STATUS =", nwStatus);
-
-//     // Check if there are any pending sync operations
-//     const anyOtxPending = await anyUpSyncPending();
-
-//     if (nwStatus.connected&&!anyOtxPending) {
-//       console.log("intervals--------> online",)
-//       // If online
-//       const response = await fetch(
-//         "https://rpwebapps.us/clients/landscape/api/v1/visit-time-intervals",
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${userData?.api_token}`,
-//           },
-//           body: JSON.stringify([
-//             {
-//               visit_id: visitId,
-//               interval: formattedCurrTime,
-//               type: type,
-//               latitude: "" + pos.coords.latitude,
-//               longitude: "" + pos.coords.longitude,
-//             },
-//           ]),
-//         }
-//       );
-//       const data = await response.json();
-//       if (response.ok) {
-//         return data;
-//       } else {
-//         throw new Error(data.message || "Failed to update interval");
-//       }
-//     } else {
-//       // If offline, store the request payload locally
-//       const requestBody = [
-//         {
-//           visit_id: visitId,
-//           interval: formattedCurrTime,
-//           type: type,
-//           latitude: "" + pos.coords.latitude,
-//           longitude: "" + pos.coords.longitude,
-//         },
-//       ];
-
-//       if (storage) {
-//         await storage.set("otx-task-Paused-" + visitId, requestBody);
-//       } else {
-//         console.error("Storage instance is not initialized");
-//       }
-
-//       // Update the status in task-list
-//       let taskListArray = await storage.get("md-task-list");
-//       for (let index = 0; index < taskListArray.length; index++) {
-//         let taskObj = taskListArray[index];
-//         if (taskObj.id === visitId) {
-//           taskObj.service_status = "Paused";
-//           taskListArray[index] = taskObj;
-//           await storage.set("md-task-list", taskListArray);
-//           break;
-//         }
-//       }
-
-//       // Update the task_initiation in task-visit-exec-v2
-//       let taskVisitExecArray = await storage.get("md-get-visit-execution-details");
-//       for (let index = 0; index < taskVisitExecArray.length; index++) {
-//         let taskObj = taskVisitExecArray[index];
-//         if (taskObj.visit_id === visitId) {
-//           let intervalObj = {
-//             visit_id: visitId,
-//           interval: formattedCurrTime,
-//           type: type,
-//           latitude: "" + pos.coords.latitude,
-//           longitude: "" + pos.coords.longitude,
-//           };
-//           taskObj.interval = [intervalObj];
-//           taskVisitExecArray[index] = taskObj;
-//           await storage.set(
-//             "md-get-visit-execution-details",
-//             taskVisitExecArray
-//           );
-//           break;
-//         }
-//       }
-//       addTaskIDToOtxTasks(visitId);
-//       addOtxToOtxSeq(visitId, task_tx_steps.Paused);
-//       return { success: true };
-//     }
-//   } catch (error) {
-//     console.error("Error updating interval:", error);
-//     throw error;
-//   }
-// };
 
 const storeIntervalOffline = async (
   visitId: any,
@@ -1471,8 +1362,7 @@ export const updateInterval = async (visitId: any, isPaused: any) => {
     if (nwStatus.connected && !anyOtxPending) {
       console.log("intervals--------> online");
       // If online
-      const response = await fetch(
-        "https://rpwebapps.us/clients/landscape/api/v1/visit-time-intervals",
+      const response = await fetch(`${API_BASE_URL}/visit-time-intervals`,
         {
           method: "POST",
           headers: {

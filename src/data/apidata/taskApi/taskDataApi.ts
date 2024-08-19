@@ -333,6 +333,7 @@ export async function fetchTaskDetails(id: string): Promise<any> {
         "tbl_status.status_name as service_status",
         "tbl_visits.visit_type",
         "tbl_visits.reference_number",
+        "tbl_visits.priority",
         "tbl_customers.customer_name",
         "tbl_customers.mobile_no",
         "tbl_visits.service_id",

@@ -101,7 +101,7 @@ export const formatDate = (dateString: any) => {
         month: "short",
         day: "numeric",
         year: "numeric",
-        // hour: 'numeric',
+       //hour: 'numeric',
         // minute: 'numeric',
         // second: 'numeric',
         hour12: false,
