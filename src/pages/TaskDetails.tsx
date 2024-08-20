@@ -270,7 +270,6 @@ const TaskDetails: React.FC = () => {
           console.log("API Response:", data); // Print the response in the console
           if (data.is_chemicals_required) {
             setShowAlert(true);
-            history.push("/taskexecution");
           } else {
             history.push("/taskexecution");
           }

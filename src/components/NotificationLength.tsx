@@ -23,19 +23,25 @@ const NotificationLength = () => {
   };
   return (
     <>
+    <div className="notiPosition">
       <IonButton
         className="notificationsIcon"
         shape="round"
         onClick={handleNotificationClick}
       >
         <IonImg src="assets/images/notifications-icon.svg" />
+       
         {/* <IonIcon className="alertNotifi" icon={ellipse}></IonIcon> */}
       </IonButton>
+
       {notification.length > 0 && (
         <IonBadge color="danger" className="alertNotifiBadg">
           {notification.length}
         </IonBadge>
-      )}
+        )}
+</div>
+
+      
     </>
   );
 };

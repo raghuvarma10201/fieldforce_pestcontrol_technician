@@ -93,7 +93,7 @@ ion-select {
     min-width: 100%;
     padding-right: 15px;
     border:none;
-    border-bottom: solid 1px #CCBBBB;
+    border: solid 1px #CCBBBB;
     box-shadow: 0px 2px 7px rgba(206, 186, 186, 0.71);
     margin-bottom: 10px;
 
@@ -794,7 +794,7 @@ ion-card.logOutCard{--background:#FFF3EB !important;
           text-align: center;
           margin: 0rem;
         //   color: #F29200;
-          color:var( --ion-color-secondary) !important;
+          color:var(--ion-color-primary-contrast) !important;
           //text-shadow:4px 2px 4px #6D2F2361;
       }
 
@@ -1164,7 +1164,7 @@ ion-card.logOutCard{--background:#FFF3EB !important;
     ion-input{
         padding-left: 10px !important;
         min-height: 56px !important;
-        border-bottom: solid 1px #CCBBBB;
+        border: solid 1px #CCBBBB;
         box-shadow: 0px 2px 7px rgba(206, 186, 186, 0.71);
         --padding-end: 15px;
     }
@@ -1386,7 +1386,7 @@ ion-card.logOutCard{--background:#FFF3EB !important;
 
 
 .headerBts {
-
+display:flex ;
 margin-top: 10px;
   ion-button {
       margin-left: 10px;
@@ -2761,11 +2761,11 @@ ion-select::part(icon) {
 }
 
 .pafFormCard {
-  background:transparent;
-  margin: 10px 0px 30px 0px;
-  padding:20px 20px;
-//   box-shadow: 0 0px 6px 4px rgb(0 0 0 / 8%);
-  position: relative;
+    background: #fff;
+    margin: 0px 0px 30px 0px;
+    padding: 0 10px;
+    position: relative;
+    border-radius: 10px;
 }
 
 .deletePaf {
@@ -3294,4 +3294,22 @@ text-overflow: ellipsis;
           }
       }
   }
+}
+.splide{
+    padding-bottom: 10px;
+}
+
+
+.notiPosition{
+    position: relative;
+    ion-badge.ion-color-danger.alertNotifiBadg{
+        position: absolute;
+        top:8px;
+        right: -2px;
+        background:#eb445a;
+        color:#fff;
+        font-size: 0.75rem;
+        border-radius: 30px;
+        padding: 3px 6px;
+    }
 }

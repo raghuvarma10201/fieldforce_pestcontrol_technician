@@ -416,7 +416,7 @@ const TaskExecution: React.FC = () => {
     } else if (taskProgress?.teamAttendance === 1 && (taskProgress?.travelStart === 1 && taskProgress?.travelEnd === 1) && taskProgress?.pestActivityDiscov === -1) {
       setNextButtonFunction(4);
       setNextButton("NEXT");
-    } else if (taskProgress?.teamAttendance === 1 && (taskProgress?.travelStart === 1 && taskProgress?.travelEnd === 1) && taskProgress?.pestActivityDiscov === 1 && taskProgress?.chemicalsUsed === -1) {
+    } else if (taskProgress?.teamAttendance === 1 && (taskProgress?.travelStart === 1 && taskProgress?.travelEnd === 1) && taskProgress?.pestActivityDiscov === 1 && (taskProgress?.chemicalsUsed === -1 || taskProgress?.chemicalsUsed === 0)) {
       setNextButtonFunction(5);
       setNextButton("NEXT");
     } else if (taskProgress?.teamAttendance === 1 && (taskProgress?.travelStart === 1 && taskProgress?.travelEnd === 1) && taskProgress?.pestActivityDiscov === 1 && taskProgress?.chemicalsUsed === 1 && taskProgress?.recommGiven === -1) {
@@ -440,7 +440,7 @@ const TaskExecution: React.FC = () => {
   const handleNextSubmit = () => {
     switch (nextButtonFunction) {
       case 0:
-        alert(0);
+        console.log('case 0');
         break;
       case 1:
         if (taskProgress?.teamAttendance !== 1 && !(taskProgress?.teamAttendance === -1 && isPaused)) {
@@ -480,13 +480,22 @@ const TaskExecution: React.FC = () => {
         }
         break;
       case 5:
+        console.log(taskProgress);
         if (taskProgress?.chemicalsUsed === -1 && isPaused) {
           toast.info("Please resume the task to perform the action");
         } else if (
           taskProgress?.recommGiven === ProgressStatus.done &&
           taskProgress?.chemicalsUsed !== ProgressStatus.done &&
           !(taskProgress?.chemicalsUsed === -1 && isPaused) &&
-          visitExecutionDetails?.pests_found?.some(
+          visitExecutionDetails.pests_found.some(
+            (pest: Pest) => pest.is_chemical_added === null
+          )
+        ) {
+          history.push("/chemicalUsed");
+        } else if (
+          taskProgress?.recommGiven !== ProgressStatus.done &&
+          taskProgress?.chemicalsUsed === ProgressStatus.inprogress &&
+          visitExecutionDetails.pests_found.some(
             (pest: Pest) => pest.is_chemical_added === null
           )
         ) {
@@ -748,6 +757,14 @@ const TaskExecution: React.FC = () => {
                   taskProgress?.chemicalsUsed !== ProgressStatus.done &&
                   !(taskProgress?.chemicalsUsed === -1 && isPaused) &&
                   visitExecutionDetails?.pests_found?.some(
+                    (pest: Pest) => pest.is_chemical_added === null
+                  )
+                ) {
+                  history.push("/chemicalUsed");
+                } else if (
+                  taskProgress?.recommGiven !== ProgressStatus.done &&
+                  taskProgress?.chemicalsUsed === ProgressStatus.inprogress &&
+                  visitExecutionDetails.pests_found.some(
                     (pest: Pest) => pest.is_chemical_added === null
                   )
                 ) {

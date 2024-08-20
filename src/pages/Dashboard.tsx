@@ -24,6 +24,7 @@ import { ellipse, sync, time } from "ionicons/icons";
 
 import { visitStatusCount } from "../data/apidata/taskApi/taskDataApi";
 import { handleCheckOut } from "../data/apidata/authApi/dataApi";
+import { retrieveNetworkTasks } from "../data/offline/entity/DataRetriever";
 import MenuAction from "../components/MenuAction";
 import NetworkCheckTime from "./NetworkCheckTime";
 import Db from "../data/offline/entity/Db";
@@ -31,10 +32,18 @@ import { syncPush } from "../data/offline/entity/sync-push";
 import { toast } from "react-toastify";
 import { fetchNotifications } from "../data/apidata/notificationsApi/notificationsApi";
 import NotificationLength from "../components/NotificationLength";
+import useLongitudeLocation from "../components/useLongitudeLocation";
+import {
+  retrieveNetworkTasksDetails,
+  retrieveNetworkTasksExecutionDetails,
+} from "../data/offline/entity/DataRetriever";
+import TaskProgress, { saveTaskProgress, updateTaskProgressStatusFromExecDetails } from "../data/localstorage/taskStatusStorage";
 
 const Dashboard: React.FC = () => {
   const { taskId } = useParams<{ taskId: string }>();
+  const [ongoingTaskData, setOnGoingTaskData] = useState<any>([]);
   const [userData, setUserData] = useState<any>(null);
+  const location = useLongitudeLocation();
   const [totalTasks, setTotalTasks] = useState<number>(0);
   const [completedTasks, setCompletedTasks] = useState<number>(0);
   const [expiredTasks, setExpiredTasks] = useState<number>(0);
@@ -79,6 +88,30 @@ const Dashboard: React.FC = () => {
       });
   }, []);
 
+  useEffect(() => {
+    getOnGoingNPendingTasks();
+  }, [location]);
+
+  const getOnGoingNPendingTasks = async () => {
+    if (location?.latitude && location?.longitude) {
+      setLoading(true);
+      console.log("Fetching Task List from Tasks");
+
+      // Fetch tasks with statuses 14 (pending), 17 (on-going), 33 (new status)
+      let rawTaskList = await retrieveNetworkTasks(
+        ["14", "17", "33"],
+        location.latitude,
+        location.longitude
+      );
+
+      let ongoingTask = rawTaskList.find((task: any) => task.service_status === "On Going")
+
+
+      setLoading(false);
+      setOnGoingTaskData(ongoingTask);
+      console.log(ongoingTask);
+    }
+  };
   const handleCheckOutClick = async () => {
     console.log("In handle check click");
     const result = await handleCheckOut();
@@ -96,7 +129,33 @@ const Dashboard: React.FC = () => {
   const handleSyncClick = async () => {
     setShowAlert(true); // Show the confirmation alert
   };
+  const startTask = async () => {
+    console.log("taskData.service_status == On Going ");
+    try {
+      const { response, data } = await retrieveNetworkTasksExecutionDetails(
+        ongoingTaskData.id
+      );
+      if (response.ok) {
+        console.log("Visit Execution Details ::", data.data);
+        const updatedTaskProgress: TaskProgress =
+          updateTaskProgressStatusFromExecDetails(
+            ongoingTaskData.id,
+            data.data
+          );
+        console.log("final progressStatus of task:", updatedTaskProgress);
+        if (updatedTaskProgress) saveTaskProgress(updatedTaskProgress);
+      } else {
+        console.error(data.message);
+        // toast.error('Server not responding. Please try again later.');
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      // toast.error('Server not responding. Please try again later.');
+    }
 
+    history.push("/taskexecution");
+
+  };
   const handleConfirmSync = async (confirm: boolean) => {
     if (confirm) {
       setLoading(true);
@@ -176,7 +235,7 @@ const Dashboard: React.FC = () => {
               src="assets/images/logo-sm-white.svg"
             />
             <div className="headerBts" slot="end">
-              <NotificationLength/>
+              <NotificationLength />
               <IonButton shape="round" routerLink={"/profile"}>
                 <IonImg src="assets/images/account-user.svg" />
               </IonButton>
@@ -264,21 +323,23 @@ const Dashboard: React.FC = () => {
         </div>
 
       </IonContent>
-      <IonFooter className="ion-footer onGoingTask">
-        <IonToolbar>
+      {!loading && ongoingTaskData ? (
+        <IonFooter className="ion-footer onGoingTask">
+          <IonToolbar>
+            <div className="ion-float-start" slot="start">
+              <h2>{ongoingTaskData.service_name}</h2>
+              <IonLabel>Reference Number <span>{ongoingTaskData.reference_number}</span></IonLabel>
+            </div>
 
+            <div className="ion-float-end statusBlock" slot="end" onClick={(e) => startTask()}> 
+              <IonLabel>Status  <span>{ongoingTaskData.service_status} <IonImg className="ion-float-right" src="assets/images/arrow-forward-w.svg"></IonImg></span></IonLabel>
+            </div>
+          </IonToolbar>
+        </IonFooter>
+      ) : (
+        ""
+      )}
 
-          <div className="ion-float-start" slot="start">
-            <h2>Flying Insect Control Flying Insect Control</h2>
-            <IonLabel>Reference Number <span>PCS240805173403</span></IonLabel>
-          </div>
-
-          <div className="ion-float-end statusBlock" slot="end">
-            <IonLabel>Status  <span>Ongoing <IonImg className="ion-float-right" src="assets/images/arrow-forward-w.svg"></IonImg></span></IonLabel>
-          </div>
-
-        </IonToolbar>
-      </IonFooter>
       <IonLoading
         isOpen={loading}
         message={"Syncing up data to server..."}
