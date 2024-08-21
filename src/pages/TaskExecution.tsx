@@ -685,7 +685,7 @@ const TaskExecution: React.FC = () => {
                   : taskProgress?.travelStart === 1 &&
                     taskProgress?.travelEnd === 1
                     ? "card card-active"
-                    : "card card-active"
+                    : "card"
               }
             >
               <h3>Track Travel Time</h3>
