@@ -323,7 +323,7 @@ const Dashboard: React.FC = () => {
         </div>
 
       </IonContent>
-      {!loading && ongoingTaskData ? (
+      {/* {!loading && ongoingTaskData ? (
         <IonFooter className="ion-footer onGoingTask">
           <IonToolbar>
             <div className="ion-float-start" slot="start">
@@ -338,7 +338,7 @@ const Dashboard: React.FC = () => {
         </IonFooter>
       ) : (
         ""
-      )}
+      )} */}
 
       <IonLoading
         isOpen={loading}

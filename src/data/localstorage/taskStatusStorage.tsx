@@ -81,7 +81,7 @@ export const updateTaskProgressStatusFromExecDetails = (taskId: string, taskDeta
         if (taskDetails.task_initiation && taskDetails.task_initiation.length > 0) {
             taskDetails.task_initiation.map((item: any, index: number) => {
                 if (item.log_type == "Service Request Start") {
-                    taskProgress.travelStart = ProgressStatus.done;
+                    taskProgress.serviceStart = ProgressStatus.done;
                 }
             })
         }
