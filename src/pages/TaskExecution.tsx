@@ -395,7 +395,7 @@ const TaskExecution: React.FC = () => {
   };
 
   useEffect(() => {
-    setIsSaveNextEnabled(taskProgress?.feedBack === 1);
+    //setIsSaveNextEnabled(taskProgress?.feedBack === 1);
     updateNextButton();
   }, [taskProgress]);
 

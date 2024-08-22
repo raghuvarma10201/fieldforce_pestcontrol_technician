@@ -1,4 +1,8 @@
+import axiosInstance from "../../../components/ApiInterceptor";
 import { API_BASE_URL } from "../../baseUrl";
+
+
+const apiUrl: any = import.meta.env.VITE_API_URL;
 
 const getUserData = () => {
     const userDataString = localStorage.getItem("userData");
@@ -10,42 +14,19 @@ const getUserData = () => {
 };
 
 export const fetchMaterilData = async (requestBody: any) => {
-    // const location = useLongitudeLocation();
-    const userData = getUserData();
-    try {
-      
-  
-      const response = await fetch(`${API_BASE_URL}/get-technician-stock`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userData?.api_token}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
-      console.log(requestBody)
-      
-  
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      console.log(response);
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching task data:", error);
-      throw error;
-    }
-   
-  };
+  try {
+    const response = await axiosInstance.post(`${apiUrl}/get-technician-stock`,requestBody);
+    console.log(response);
+    return response.data;
+  }
+  catch(error){
+    throw error;
+  }   
+};
 
-  export const fetchTechnicians = async () => {
-    const userDataString = localStorage.getItem("userData");
-    if (!userDataString) {
-      console.error("User data is not available");
-      throw new Error("User Data Not available");
-    }
-    const userData = JSON.parse(userDataString);
-    const payload = {
+export const fetchTechnicians = async () => {
+  try {
+    const requestBody = {
       columns: [
         "user_id",
         "first_name",
@@ -65,78 +46,31 @@ export const fetchMaterilData = async (requestBody: any) => {
         page: "0",
       },
     };
-    try {
-      const response = await fetch(`${API_BASE_URL}/get-ideal-technicians`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userData?.api_token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Response in fetchIdealTechnicians", data);
-        return data;
-      } else {
-        console.error("Error fetching ideal technicians:", response.statusText);
-        throw new Error(
-          `Error fetching ideal technicians: ${response.statusText}`
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching ideal technicians:", error);
-      throw error;
-    }
-  };
-
-  export const transferStock = async (toId: any, materials: any) => {
-    const userDataString = localStorage.getItem("userData");
-    if (!userDataString) {
-      console.error("User data is not available");
-      throw new Error("User Data Not available");
-    }
-    const userData = JSON.parse(userDataString);
-    const payload = {
+    const response = await axiosInstance.post(`${apiUrl}/get-ideal-technicians`,requestBody);
+    console.log(response);
+    return response.data;
+  }
+  catch(error){
+    throw error;
+  }   
+};
+export const transferStock = async (toId: any, materials: any) => {
+  try {
+    const requestBody = {
       "to_technician_id": toId,
       "item_details": materials
     };
-    try {
-      const response = await fetch(`${API_BASE_URL}/transfer-stock-by-technician`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userData?.api_token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Response for transfer stock", data);
-        return data;
-      } else {
-        console.error("Error while transfering stocks:", response.statusText);
-        throw new Error(
-          `Error while transfering stocks: ${response.statusText}`
-        );
-      }
-    } catch (error) {
-      console.error("Error while transfering stocks:", error);
-      throw error;
-    }
-
+    const response = await axiosInstance.post(`${apiUrl}/transfer-stock-by-technician`,requestBody);
+    console.log(response);
+    return response.data;
   }
-
-  
-
-  export const techniciansStockTransferred = async (page: any) => {
-    const userDataString = localStorage.getItem("userData");
-    if (!userDataString) {
-      console.error("User data is not available");
-      throw new Error("User Data Not available");
-    }
-    const userData = JSON.parse(userDataString);
-    const payload = {
+  catch(error){
+    throw error;
+  }   
+};
+export const techniciansStockTransferred = async (page: any) => {
+  try {
+    const requestBody = {
       "columns": [
         "tbl_stock_transfer.id",
         "tbl_stock_transfer.from_technician_id",
@@ -150,47 +84,29 @@ export const fetchMaterilData = async (requestBody: any) => {
         "tbl_user.mobile_no",
         "tbl_status.status_name",
         "tbl_stock_transfer.reference_number"
-    ],
-    "order_by": {
-      "tbl_stock_transfer.created_on": "desc"
-    },
-    "filters": {
-      "search":""
-    },
-    "custom-filters": {
-      "operation_type": "TRANSFERRED"
-    },
-    "pagination": {
-      "limit":"100",
-      "page":"0"
-    }
-    };
-    try {
-      const response = await fetch(`${API_BASE_URL}/get-technicians-stock-transferred`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userData?.api_token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Response for technicians stock transfer", data);
-        return data;
-      } else {
-        console.error("Error:", response.statusText);
-        throw new Error(
-          `Error : ${response.statusText}`
-        );
+      ],
+      "order_by": {
+        "tbl_stock_transfer.created_on": "desc"
+      },
+      "filters": {
+        "search":""
+      },
+      "custom-filters": {
+        "operation_type": "TRANSFERRED"
+      },
+      "pagination": {
+        "limit":"100",
+        "page":"0"
       }
-    } catch (error) {
-      console.error("Error :", error);
-      throw error;
-    }
-
-  };
-
+    };
+    const response = await axiosInstance.post(`${apiUrl}/get-technicians-stock-transferred`,requestBody);
+    console.log(response);
+    return response.data;
+  }
+  catch(error){
+    throw error;
+  }   
+};
   export const techniciansStockRecieved = async (page: any) => {
     const userDataString = localStorage.getItem("userData");
     if (!userDataString) {

@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<any> = ({ children }) => {
             console.log('API Response:', response.data);
             localStorage.setItem('token', response.data.data[0].api_token);
             localStorage.setItem('userData', JSON.stringify(response.data.data[0]));
-            localStorage.setItem('userPermissions',JSON.stringify(response.data.data.permission_types));
+            //localStorage.setItem('userPermissions',JSON.stringify(response.data.data.permission_types));
             setIsLoggedIn(true);
             return response;
         }
@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<any> = ({ children }) => {
         try {
             const response = await axiosInstance.post(apiUrl + 'api/v1/logout', {}, { headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' } });
             console.log('API Response:', response.data);
-            const keysToKeep = ['device_token', 'rememberedUserName', 'rememberedPassword'];
+            const keysToKeep = ['device_token', 'username', 'password'];
             const savedValues = keysToKeep.map(key => ({ key, value: localStorage.getItem(key) }));
             localStorage.clear();
             savedValues.forEach(({ key, value }) => {

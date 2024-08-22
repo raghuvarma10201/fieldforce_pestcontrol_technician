@@ -19,6 +19,7 @@ axiosInstance.interceptors.request.use((config:any) => {
     (response) => response,
     (error) => {
       // Check if the error is an authentication error
+      console.log(error);
       const originalRequest = error.config;
       if (error.response.status == 401 && !originalRequest._retry) {
         // Handle logout and redirect to login page

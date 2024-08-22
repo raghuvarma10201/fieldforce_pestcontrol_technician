@@ -1,14 +1,10 @@
+import axiosInstance from "../../../components/ApiInterceptor";
 import { API_BASE_URL } from "../../baseUrl";
 
-export const fetchNotifications = async () => {
-  // const location = useLongitudeLocation();
-  const userDataString = localStorage.getItem("userData");
-  if (!userDataString) {
-    console.error("User data is not available");
-    return;
-  }
+const apiUrl: any = import.meta.env.VITE_API_URL;
 
-  const userData = JSON.parse(userDataString);
+
+export const fetchNotifications = async () => {
   try {
     const requestBody = {
       columns: [
@@ -29,63 +25,26 @@ export const fetchNotifications = async () => {
         page: "0",
       },
     };
-
-    const response = await fetch(`${API_BASE_URL}/get-notifications`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userData?.api_token}`,
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch data");
-    }
+    const response = await axiosInstance.post(`${apiUrl}/get-notifications`,requestBody);
     console.log(response);
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching task data:", error);
-    throw error;
+    return response.data;
   }
+  catch(error){
+      console.error(error);
+  }   
 };
 
-export const updateNotificationStatus = async (
-  id: number,
-  updateData: { read: boolean }
-) => {
-  const userDataString = localStorage.getItem("userData");
-  if (!userDataString) {
-    console.error("User data is not available");
-    return;
-  }
-
-  const userData = JSON.parse(userDataString);
+export const updateNotificationStatus = async (id: number,updateData: { read: boolean }) => {
   try {
     const requestBody = {
       notification_id: id, // use the passed id
       read: updateData.read, // include the read status
     };
-
-    const response = await fetch(
-      `${API_BASE_URL}/update-push-notification-status`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userData?.api_token}`,
-        },
-        body: JSON.stringify(requestBody),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to update notification status");
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error updating notification status:", error);
-    throw error;
+    const response = await axiosInstance.post(`${apiUrl}/update-push-notification-status`,requestBody);
+    console.log(response);
+    return response.data;
   }
+  catch(error){
+      console.error(error);
+  }   
 };

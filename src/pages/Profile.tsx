@@ -15,9 +15,11 @@ import { pencil, arrowBack } from "ionicons/icons";
 import { useHistory } from "react-router";
 import AvatarImage from "../../public/assets/images/avatar_image.svg";
 import ChangePasswordForm from "../components/ChangePassword";
+import { useAuth } from "../components/AuthContext";
 
 const Profile: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
+  const {logout} = useAuth();
   const [avatar, setAvatar] = useState<string>(AvatarImage);
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
 
@@ -56,10 +58,12 @@ const Profile: React.FC = () => {
     setShowChangePasswordForm(false);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("userData");
-    localStorage.removeItem("checkInFlag");
-    history.push("/login");
+  const handleLogout = async () => {
+    const response = await logout();
+    console.log("Logout Response", response);
+    if(response && response.data.status == 200 && response.data.success){
+      history.push('/login');
+    }
   };
 
   return (

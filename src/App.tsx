@@ -76,6 +76,7 @@ import StockTransferredDetails from "./pages/StockTransferDetails";
 import PestActivityFoundPreview from "../src/pages/PestActivityFoundPreview";
 import ChemicalUsedPreview from "../src/pages/ChemicalUsedPreview";
 import { AuthProvider } from "./components/AuthContext";
+import AuthGuard from "./components/AuthGuard";
 
 setupIonicReact();
 const getUserId = () => {
@@ -157,115 +158,45 @@ const App: React.FC = () => {
         <IonReactRouter>
           <IonRouterOutlet>
             <Switch>
-              <Route exact path="/home">
-                <Home />
-              </Route>
-              <Route exact path="/ChemicalUsedPreview">
-                <ChemicalUsedPreview />
-              </Route>
-
-              <Route exact path="/pestActivityfoundpreview">
-                <PestActivityFoundPreview />
-              </Route>
-              <Route exact path="/dashboard">
-                <Dashboard />
-              </Route>
-              <Route exact path="/MaterialList">
-                <MaterialList />
-              </Route>
-              <Route exact path="/tasks">
-                <Tasks />
-              </Route>
-
-              <Route exact path="/tasks/:taskId">
-                <TaskDetails />
-              </Route>
-              <Route exact path="/formdata/:taskId">
-                <FormData />
-              </Route>
-              <Route exact path="/taskreschedule">
-                <TaskReschedule />
-              </Route>
-              <Route exact path="/taskexecution">
-                <TaskExecution />
-              </Route>
-              <Route exact path="/taskpreview">
-                <TaskPreview />
-              </Route>
-              <Route exact path="/teamattendance/:techniciansRequired">
-                <TeamAttendance />
-              </Route>
-              <Route exact path="/availabletechnicians">
-                <AvailableTechnicians />
-              </Route>
-              <Route exact path="/pestactivityfound">
-                <PestActivityFound />
-              </Route>
-              <Route exact path="/recommendations">
-                <Recommendations />
-              </Route>
-              <Route exact path="/chemicalused">
-                <ChemicalUsed />
-              </Route>
-              <Route exact path="/chemicaluseddetails">
-                <ChemicalUsedDetails />
-              </Route>
-              <Route exact path="/workdonedetails">
-                <WorkDoneDetails />
-              </Route>
-              <Route exact path="/feedbackfollowup">
-                <FeedbackFollowup />
-              </Route>
-              <Route exact path="/site">
-                <Site />
-              </Route>
-              <Route exact path="/siteviewlocation/:taskId">
-                <SiteViewLocation />
-              </Route>
-              <Route exact path="/notification">
-                <Notification />
-              </Route>
-              <Route exact path="/preview">
-                <Preview />
-              </Route>
-              <Route exact path="/profile">
-                <Profile />
-              </Route>
-              <Route exact path="/leaverequestlist">
-                <LeaveRequestList />
-              </Route>
-              <Route exact path="/applyleave">
-                <ApplyLeave />
-              </Route>
-              <Route path="/login">
-                <Login />
-              </Route>
-              <Route exact path="/createTask">
-                <CreateTask />
-              </Route>
-
-              <Route exact path="/stocktransferreddetails/:id">
-                <StockTransferredDetails />
-              </Route>
-
-              <Route exact path="/stocktransferredreceived">
-                <StockTransferredReceived />
-              </Route>
-
-              <Route exact path="/stocktransfer">
-                <StockTransfer />
-              </Route>
-              <Route path="/redirectpage">
-                <RedirectPage />
-              </Route>
-              <Route exact path="/forms">
-                <Forms />
-              </Route>
-              <Route path="/changePassword" component={ChangePasswordForm} />
-
               <Route exact path="/">
                 <Redirect to="/redirectpage" />
               </Route>
+              <Route path="/redirectpage" component={RedirectPage} />
+              <Route path="/login" component={Login} />
+
+
+              <AuthGuard path="/home" component={Home} />
+              <AuthGuard path="/ChemicalUsedPreview" component={ChemicalUsedPreview} />
+              <AuthGuard path="/pestActivityfoundpreview" component={PestActivityFoundPreview} />
+              <AuthGuard path="/dashboard" component={Dashboard} />
+              <AuthGuard path="/MaterialList" component={MaterialList} />
+              <AuthGuard path="/tasks" component={Tasks} />
+              <AuthGuard path="/tasks/:taskId" component={TaskDetails} />
+              <AuthGuard path="/formdata/:taskId" component={FormData} />
+              <AuthGuard path="/taskreschedule" component={TaskReschedule} />
+              <AuthGuard path="/taskexecution" component={TaskExecution} />
+              <AuthGuard path="/taskpreview" component={TaskPreview} />
+              <AuthGuard path="/teamattendance/:techniciansRequired" component={TeamAttendance} />
+              <AuthGuard path="/availabletechnicians" component={AvailableTechnicians} />
+              <AuthGuard path="/pestactivityfound" component={PestActivityFound} />
+              <AuthGuard path="/recommendations" component={Recommendations} />
+              <AuthGuard path="/chemicalused" component={ChemicalUsed} />
+              <AuthGuard path="/chemicaluseddetails" component={ChemicalUsedDetails} />
+              <AuthGuard path="/workdonedetails" component={WorkDoneDetails} />
+              <AuthGuard path="/feedbackfollowup" component={FeedbackFollowup} />
+              <AuthGuard path="/siteviewlocation/:taskId" component={SiteViewLocation} />
+              <AuthGuard path="/notification" component={Notification} />
+              <AuthGuard path="/preview" component={Preview} />
+              <AuthGuard path="/profile" component={Profile} />
+              <AuthGuard path="/leaverequestlist" component={LeaveRequestList} />
+              <AuthGuard path="/applyleave" component={ApplyLeave} />
+              <AuthGuard path="/createTask" component={CreateTask} />
+              <AuthGuard path="/stocktransferreddetails/:id" component={StockTransferredDetails} />
+              <AuthGuard path="/stocktransferredreceived" component={StockTransferredReceived} />
+              <AuthGuard path="/stocktransfer" component={StockTransfer} />
+              <AuthGuard path="/forms" component={Forms} />
+              <AuthGuard path="/changePassword" component={ChangePasswordForm} />
+              
             </Switch>
           </IonRouterOutlet>
         </IonReactRouter>
