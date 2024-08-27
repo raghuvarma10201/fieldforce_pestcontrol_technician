@@ -171,7 +171,7 @@ const App: React.FC = () => {
               <AuthGuard path="/dashboard" component={Dashboard} />
               <AuthGuard path="/MaterialList" component={MaterialList} />
               <AuthGuard path="/tasks" component={Tasks} />
-              <AuthGuard path="/tasks/:taskId" component={TaskDetails} />
+              <AuthGuard path="/task/:taskId" component={TaskDetails} />
               <AuthGuard path="/formdata/:taskId" component={FormData} />
               <AuthGuard path="/taskreschedule" component={TaskReschedule} />
               <AuthGuard path="/taskexecution" component={TaskExecution} />

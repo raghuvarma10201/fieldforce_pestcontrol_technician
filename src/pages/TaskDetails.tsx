@@ -47,6 +47,8 @@ import { Network } from "@capacitor/network";
 import { submitTaskStart } from "../data/offline/entity/DataTransfer";
 import { toast } from "react-toastify";
 import NotificationLength from "../components/NotificationLength";
+
+
 const TaskDetails: React.FC = () => {
   const params: any = useParams();
   // const { id } = useParams<{ id: string }>(); // Dynamically fetch taskId from URL
@@ -63,12 +65,14 @@ const TaskDetails: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
+    console.log('ddd');
     loadTaskFromParams();
     fetchTDetails(taskId);
     // fetchTaskDetails(taskId)
   }, []); // Execute useEffect whenever taskId changes
 
   const fetchTDetails = async (taskId: any) => {
+    
     console.log("Going to fetch Task Details for task ID ::::", taskId);
     setLoading(true); // Start loading
 
@@ -104,7 +108,7 @@ const TaskDetails: React.FC = () => {
   };
 
   const loadTaskFromParams = () => {
-    // console.log("id from params = ", id);
+    console.log("##########################################");
     console.log("LOADING task ID from params = ", params);
     console.log("params wise task id ", params.taskId);
     // setActiveTaskId(params.id)

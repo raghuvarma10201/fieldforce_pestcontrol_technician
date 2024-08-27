@@ -19,7 +19,7 @@ import {
 } from "@ionic/react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
-import { loginApi, userCheckIn, userCheckIns } from "../../data/apidata/authApi/dataApi";
+import { userCheckIn, userCheckIns } from "../../data/apidata/authApi/dataApi";
 import "react-toastify/dist/ReactToastify.css";
 import { registerDevice } from "../../utils/pushNotiications";
 import { eye, eyeOff } from "ionicons/icons"; // Import icons
@@ -81,7 +81,7 @@ const Login: React.FC = () => {
         if (response.data.status == 200 && response.data.success == true) {
           console.log("hi")
           toast.success(response.data.message);
-          console.log(response.data.data[0].role_name, "rolenamre");
+          console.log(response.data.data[0].role_name, "rolename");
           const userData = response.data.data[0]
           if (userData.last_action === "1") {
             try {

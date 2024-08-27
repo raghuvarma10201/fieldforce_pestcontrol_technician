@@ -308,8 +308,11 @@ const Tasks: React.FC = () => {
 
     try {
       const taskDetails = await retrieveNetworkTasksDetails(taskId);
+      console.log(taskDetails);
+      
       localStorage.setItem("activeTaskData", JSON.stringify(taskDetails));
-      history.push(`/tasks/${taskId}`);
+      //return;
+      history.push("/task/"+taskId);
     } catch (error) {
       console.error("Error fetching task details:", error);
       toast.error("Server not responding. Please try again later.");
@@ -488,7 +491,7 @@ const Tasks: React.FC = () => {
                       <div className="task-container">
                         <TaskComponent
                           id={task.id}
-                          path={`/tasks/${task.id}`}
+                          path={`/task/${task.id}`}
                           title={task.service_name}
                           subTitle={task.address}
                           serviceDate={task.service_date}
@@ -549,7 +552,7 @@ const Tasks: React.FC = () => {
                       <div className="task-container">
                         <TaskComponent
                           id={task.id}
-                          path={`/tasks/${task.id}`}
+                          path={`/task/${task.id}`}
                           title={task.service_name}
                           subTitle={task.address}
                           serviceDate={task.service_date}

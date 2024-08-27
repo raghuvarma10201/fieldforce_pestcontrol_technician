@@ -21,7 +21,6 @@ export const fetchLeaveDetails = async () => {
   }   
 };
 
-
 /////////////////// Fetch Leaves Types//////////////
 export const fetchLeaveTypes = async () => {
   try {

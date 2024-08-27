@@ -296,7 +296,7 @@ const TaskExecution: React.FC = () => {
     const taskId = activeTaskData.id; // Assuming the task ID is in the first element
 
     // Navigate to task details page when Cancel button is clicked
-    history.push(`/tasks/${taskId}`);
+    history.push(`/task/${taskId}`);
   };
 
   const visitId = activeTaskData.id;
@@ -592,7 +592,7 @@ const TaskExecution: React.FC = () => {
             </IonButton>
             <IonButton
               shape="round"
-              routerLink={"/tasks/" + activeTaskData.id}
+              routerLink={"/task/" + activeTaskData.id}
             >
               <IonImg src="/assets/images/task-details-icon.svg"></IonImg>
             </IonButton>

@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<any> = ({ children }) => {
                 "password":password,
                 "device_id":deviceToken
             }
-            const response = await axios.post(apiUrl + 'api/v1/login', payload, { headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' } });
+            const response = await axios.post(apiUrl + '/login', payload, { headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' } });
             console.log('API Response:', response.data);
             localStorage.setItem('token', response.data.data[0].api_token);
             localStorage.setItem('userData', JSON.stringify(response.data.data[0]));

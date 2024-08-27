@@ -1,5 +1,8 @@
+import axiosInstance from "../../../components/ApiInterceptor";
 import useLongitudeLocation from "../../../components/useLongitudeLocation";
 import { API_BASE_URL } from "../../baseUrl";
+
+const apiUrl: any = import.meta.env.VITE_API_URL;
 
 interface Technician {
   first_name: string;
@@ -9,72 +12,40 @@ interface Technician {
   user_id: string;
 }
 //////////////Fetch Ideal Technician List//////////////////
+
 export const fetchIdealTechnicians = async (): Promise<Technician[]> => {
-  const userDataString = localStorage.getItem("userData");
-  if (!userDataString) {
-    console.error("User data is not available");
-    throw new Error("User Data Not available");
-  }
-  const userData = JSON.parse(userDataString);
-  const payload = {
-    columns: [
-      "user_id",
-      "first_name",
-      "last_name",
-      "email_id",
-      "mobile_no",
-      "avatar",
-    ],
-    order_by: {
-      created_on: "asc",
-    },
-    filters: {
-      last_action: "1",
-      work_status: "idle",
-    },
-    pagination: {
-      limit: "10",
-      page: "0",
-    },
-  };
   try {
-    const response = await fetch(`${API_BASE_URL}/get-ideal-technicians`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userData?.api_token}`,
+    const requestBody = {
+      columns: [
+        "user_id",
+        "first_name",
+        "last_name",
+        "email_id",
+        "mobile_no",
+        "avatar",
+      ],
+      order_by: {
+        created_on: "asc",
       },
-      body: JSON.stringify(payload),
-    });
-    if (response.ok) {
-      const data: Technician[] = await response.json();
-      console.log("Response in fetchIdealTechnicians", data);
-      return data;
-    } else {
-      console.error("Error fetching ideal technicians:", response.statusText);
-      throw new Error(
-        `Error fetching ideal technicians: ${response.statusText}`
-      );
-    }
-  } catch (error) {
-    console.error("Error fetching ideal technicians:", error);
+      filters: {
+        last_action: "1",
+        work_status: "idle",
+      },
+      pagination: {
+        limit: "10",
+        page: "0",
+      },
+    };
+    const response = await axiosInstance.post(`${apiUrl}/get-ideal-technicians`, requestBody);
+    console.log(response);
+    return response.data;
+  }
+  catch (error) {
     throw error;
   }
 };
 ////////////////////Submit Technician Data////////////////
-export const submitTechnicianData = async (
-  baseImage: any,
-  selectedTechnicianData: Technician[],
-  latitude: number,
-  longitude: number
-): Promise<void> => {
-  // const location = useLongitudeLocation();
-  const userDataString = localStorage.getItem("userData");
-  if (!userDataString) {
-    console.error("User data is not available");
-    return;
-  }
-  const userData = JSON.parse(userDataString);
+export const submitTechnicianData = async (baseImage: any,selectedTechnicianData: Technician[],latitude: number,longitude: number): Promise<void> => {
   localStorage.setItem("selectedTechnicianData", JSON.stringify(selectedTechnicianData));
   //Fetch Active Task ID
   const activeTaskStr = localStorage.getItem("activeTaskData");
@@ -87,35 +58,24 @@ export const submitTechnicianData = async (
     user_id: technician.user_id,
     user_image: technician.avatar || "",
   }));
-
-  const payload = [
-    {
-      visit_id, //Required
-      team_count: selectedTechnicianData.length.toString(), //Required
-      latitude,
-      longitude,
-      team_photo: baseImage ? baseImage : "",
-      visit_team,
-    },
-  ];
   try {
-    const response = await fetch(`${API_BASE_URL}/add-team-attendance`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${userData?.api_token}`,
-      },
-
-      body: JSON.stringify(payload),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Response in Submit technician data", data);
-      return data;
-    } else {
-      console.error("Error Submit  technicians:", response.statusText);
-    }
-  } catch (error) {
-    console.error("Error Submit  technicians:", error);
+    const requestBody = [
+      {
+        visit_id, //Required
+        team_count: selectedTechnicianData.length.toString(), //Required
+        latitude,
+        longitude,
+        team_photo: baseImage ? baseImage : "",
+        visit_team,
+      }
+    ];
+    const response = await axiosInstance.post(`${apiUrl}/add-team-attendance`, requestBody);
+    console.log(response);
+    return response.data;
+  }
+  catch (error) {
+    throw error;
   }
 };
+
+
