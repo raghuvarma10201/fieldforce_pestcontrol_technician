@@ -171,7 +171,7 @@ export const submitTaskStart = async (
     let anyOtxPending = await anyUpSyncPending();
     // If online
     if (nwStatus.connected && !anyOtxPending) {
-      const { response, data } = await taskInit(
+      const response = await taskInit(
         taskId,
         timestamp,
         log_type,
@@ -181,7 +181,7 @@ export const submitTaskStart = async (
 
       //   throw new Error("Error in Submitting the Data. Please contact your Supervisor or Admin.")
       // }
-      return { response, data };
+      return response;
     } else {
       //If offline
       // Store the Payload

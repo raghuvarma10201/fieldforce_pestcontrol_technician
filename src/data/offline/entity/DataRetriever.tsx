@@ -117,6 +117,7 @@ export const retrieveNetworkFilteredTasks = async (
 
     if (filterCriteria.priority !== "" && filterCriteria.service_date !== "") {
       await fetchFilteredTaskData(filterCriteria, lat, long).then((response) => {
+        console.log(response);
         if (response && response.success) {
           // const sortedData = response.data.sort(
           //   (a: any, b: any) =>
@@ -208,13 +209,13 @@ export const retrieveNetworkTasksDetails = async (taskID: any) => {
 // =======================================task-execution-details==============================
 const fetchVisitExecutionDetails = async (visitId: string) => {
   try {
-    const { response, data } = await getVisitExecutionDetails(visitId);
-    if (response.ok) {
-      console.log("Visit Execution Details ::", data.data);
-      return data.data;
+    const response= await getVisitExecutionDetails(visitId);
+    if (response.success) {
+      console.log("Visit Execution Details ::", response.data);
+      return response.data;
     } else {
 
-      console.error(data.message);
+      console.error(response.message);
       return { error: true, message: "Transaction Failed" }
     }
   } catch (error) {
@@ -388,14 +389,14 @@ export const retrieveServiceRequestBasedOnNetwork = async () => {
 
 const getInitTimesOnline = async (taskId: string) => {
   try {
-    const { response, data } = await getTaskInitTimes(taskId);
-    console.log("getInitTimes", data.data);
+    const response = await getTaskInitTimes(taskId);
+    console.log("getInitTimes", response.data);
     console.log("getTimesResponse", response);
-    if (response.ok) {
-      console.log("Visit InitTimes Details ::", data.data);
-      return data.data;
+    if (response) {
+      console.log("Visit InitTimes Details ::", response.data);
+      return response.data;
     } else {
-      console.error(data.message);
+      console.error(response.message);
     }
   } catch (error) {
     console.error("Error:", error);
@@ -902,13 +903,13 @@ export const retrievevisitExecutionDetailsBasedonNetwork = async (taskID: any) =
 // Function to fetch questionnaire data from the server
 const fetchQuestionnaireFromServer = async () => {
   try {
-    const { response, data } = await fetchQuestionnaire();
-    if (response.ok) {
-      console.log("Fetched questionnaire data (online):", data);
-      return data;
+    const response = await fetchQuestionnaire();
+    if (response.success) {
+      console.log("Fetched questionnaire data (online):", response.data);
+      return response.data;
     } else {
-      console.error(data.message);
-      throw new Error(data.message);
+      console.error(response.message);
+      throw new Error(response.message);
     }
   } catch (error) {
     console.error("Error fetching questionnaire data:", error);

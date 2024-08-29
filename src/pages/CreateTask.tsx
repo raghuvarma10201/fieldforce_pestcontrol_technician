@@ -133,8 +133,8 @@ const CreateTask: React.FC = () => {
     setLoading(true);
     treatmentTypes(serviceId)
       .then((response) => {
-        if (response && response.data.success) {
-          const treatmentDetails = response.data.data;
+        if (response && response.success) {
+          const treatmentDetails = response.data;
           setTreatmentData(treatmentDetails);
         } else {
           console.error("Failed to fetch treatment data. Error:", response);
@@ -171,8 +171,8 @@ const CreateTask: React.FC = () => {
     setLoading(true);
     pestReported(serviceId)
       .then((response) => {
-        if (response && response.data.success) {
-          const pestsDetails = response.data.data;
+        if (response && response.success) {
+          const pestsDetails = response.data;
           setPestsData(pestsDetails);
         } else {
           console.error("Failed to fetch pests data. Error:", response);
@@ -192,8 +192,9 @@ const CreateTask: React.FC = () => {
     setLoading(true);
     customerList()
       .then((response) => {
-        if (response && response.data.success) {
-          const customerDetails = response.data.data.map((customer: any) => ({
+        console.log(response);
+        if (response && response.success) {
+          const customerDetails = response.data.map((customer: any) => ({
             text: customer.customer_name,
             value: customer.id,
           }));
@@ -216,8 +217,8 @@ const CreateTask: React.FC = () => {
     setLoading(true);
     customerLocations(customerId)
       .then((response) => {
-        if (response && response.data.success) {
-          const customerLocationDetails = response.data.data;
+        if (response && response.success) {
+          const customerLocationDetails = response.data;
           setCustomerLocData(customerLocationDetails);
         } else {
           console.error(
@@ -239,8 +240,8 @@ const CreateTask: React.FC = () => {
   const getCustomerTypes = async () => {
     customerType()
       .then((response) => {
-        if (response && response.data.success) {
-          const customerTypeData = response.data.data;
+        if (response && response.success) {
+          const customerTypeData = response.data;
           setCustomerTypeDetails(customerTypeData);
         } else {
           console.error("Failed to fetch customer types", response);
@@ -256,8 +257,8 @@ const CreateTask: React.FC = () => {
   const getAreasList = async () => {
     getAreas()
       .then((response) => {
-        if (response && response.data.success) {
-          const areasData = response.data.data;
+        if (response && response.success) {
+          const areasData = response.data;
           setAreasDetails(areasData);
         } else {
           console.error("Failed to fetch areas", response);
@@ -464,8 +465,8 @@ const CreateTask: React.FC = () => {
     setLoading(true);
     serviceList()
       .then((response) => {
-        if (response && response.data.success) {
-          const serviceListDetails = response.data.data;
+        if (response && response.success) {
+          const serviceListDetails = response.data;
           setServiceData(serviceListDetails);
         } else {
           console.error("Failed to fetch service list data. Error:", response);
@@ -483,8 +484,8 @@ const CreateTask: React.FC = () => {
     setLoading(true);
     timeDuration()
       .then((response) => {
-        if (response && response.data.success) {
-          const durationDetails = response.data.data;
+        if (response && response.success) {
+          const durationDetails = response.data;
           setDurationData(durationDetails);
         } else {
           console.error("Failed to fetch duration list data. Error:", response);

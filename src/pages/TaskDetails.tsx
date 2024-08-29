@@ -254,7 +254,7 @@ const TaskDetails: React.FC = () => {
         //   "Service Request Start",
         //   "Service Initiated"
         // );
-        const { response, data } = await submitTaskStart(
+        const response= await submitTaskStart(
           taskDetails.id,
           formattedDate,
           "Service Request Start",
@@ -267,21 +267,21 @@ const TaskDetails: React.FC = () => {
         );
         console.log(
           "Response from API:----------------------------------->",
-          data
+          response.data
         );
-        if (response.ok) {
+        if (response.success) {
           const progressStatus: TaskProgress = setStartStatus("" + taskId);
-          console.log("API Response:", data); // Print the response in the console
-          if (data.is_chemicals_required) {
+          console.log("API Response:", response.data); // Print the response in the console
+          if (response.is_chemicals_required) {
             setShowAlert(true);
-            history.push("/taskexecution");
+            //history.push("/taskexecution");
           } else {
             history.push("/taskexecution");
           }
         } else {
           console.error("Error Checking In ", response);
-          setError(data.message);
-          if (data.is_chemicals_required) {
+          setError(response.message);
+          if (response.is_chemicals_required) {
             setShowAlert(true);
           }
         }
