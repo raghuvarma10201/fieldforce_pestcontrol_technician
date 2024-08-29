@@ -66,17 +66,18 @@ const Home: React.FC = () => {
 
   const handleCheckIn = async () => {
     try {
-      const { response, data } = await userCheckIn();
-      if (response.ok) {
-        if (data.is_chemicals_required) {
+      const response = await userCheckIn();
+      console.log(response);
+      if (response) {
+        if (response.is_chemicals_required) {
           setShowAlert(true);
         } else {
           localStorage.setItem("checkInFlag", "true");
           history.push("/dashboard");
         }
       } else {
-        setError(data.message);
-        if (data.is_chemicals_required) {
+        setError(response.message);
+        if (response.is_chemicals_required) {
           setShowAlert(true);
         }
       }

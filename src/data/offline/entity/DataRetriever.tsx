@@ -864,12 +864,12 @@ const retrieveVisitExecutionsFromStorage = async (visitId: string) => {
 
 const fetchVisitExecutionDetailsforRecommendations = async (visitId: string) => {
   try {
-    const { response, data } = await getVisitExecutionDetails(visitId);
-    if (response.ok) {
-      console.log("Visit Execution Details ::", data.data);
-      return data.data;
+    const response = await getVisitExecutionDetails(visitId);
+    if (response.success) {
+      console.log("Visit Execution Details ::", response.data);
+      return response.data;
     } else {
-      console.error(data.message);
+      console.error(response.message);
     }
   } catch (error) {
     console.error("Error:", error);

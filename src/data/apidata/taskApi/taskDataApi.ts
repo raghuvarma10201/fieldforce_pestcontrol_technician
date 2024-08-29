@@ -195,7 +195,7 @@ export const taskInit = async (visit_id: string,formattedDate: string,log_type: 
     ];
     const response = await axiosInstance.post(`${apiUrl}/task-initiate`, requestBody);
     console.log(response);
-    return response.data;
+    return response.data[0];
   }
   catch (error) {
     throw error;
