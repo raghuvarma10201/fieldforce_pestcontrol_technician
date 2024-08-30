@@ -41,6 +41,8 @@ import TaskProgress, { saveTaskProgress, setStartStatus, updateTaskProgressStatu
 import { getDateTime } from "../utils/dateTimeUtils";
 import { submitTaskStart } from "../data/offline/entity/DataTransfer";
 
+const isProd: any = import.meta.env.PROD;
+
 const Dashboard: React.FC = () => {
   const { taskId } = useParams<{ taskId: string }>();
   const [ongoingTaskData, setOnGoingTaskData] = useState<any>([]);

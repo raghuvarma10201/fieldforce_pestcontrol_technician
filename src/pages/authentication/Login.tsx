@@ -24,7 +24,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { registerDevice } from "../../utils/pushNotiications";
 import { eye, eyeOff } from "ionicons/icons"; // Import icons
 import { useAuth } from '../../components/AuthContext';
+import EnvironmentRibbon from "../../components/EnvironmentRibbon";
 
+const isProd: any = import.meta.env.PROD;
 
 const Login: React.FC = () => {
   const logo = "assets/images/logo-login.svg";
@@ -152,7 +154,9 @@ const Login: React.FC = () => {
 
   return (
     <IonPage>
+      
       <IonContent fullscreen className="ion-login">
+        {!isProd && <EnvironmentRibbon position="ribbon top-right"/>}
         {loading && <IonProgressBar type="indeterminate" color="success" />}
         <div className="loginwrapp">
           <IonImg

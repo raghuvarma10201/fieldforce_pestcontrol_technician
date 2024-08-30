@@ -16,6 +16,9 @@ import { useHistory } from "react-router";
 import AvatarImage from "../../public/assets/images/avatar_image.svg";
 import ChangePasswordForm from "../components/ChangePassword";
 import { useAuth } from "../components/AuthContext";
+import EnvironmentRibbon from "../components/EnvironmentRibbon";
+
+const isProd: any = import.meta.env.PROD;
 
 const Profile: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
@@ -68,6 +71,7 @@ const Profile: React.FC = () => {
 
   return (
     <>
+    {!isProd && <EnvironmentRibbon position="ribbon top-right"/>}
     <IonHeader  className="ion-no-border ion-padding-horizontal">
       <IonToolbar>
         <IonButtons slot="start" className="ion-no-padding">
@@ -83,6 +87,7 @@ const Profile: React.FC = () => {
 
 
       <IonContent fullscreen className="ionContentColor profileWrapp">
+      
         <div style={{ paddingBottom: "16px", textAlign: "center" }}>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <div

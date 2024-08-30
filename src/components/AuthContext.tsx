@@ -80,9 +80,10 @@ export const AuthProvider: React.FC<any> = ({ children }) => {
        
     const logout = async () => {
         try {
-            const response = await axiosInstance.post(apiUrl + 'api/v1/logout', {}, { headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' } });
+            alert('ddd');
+            const response = await axiosInstance.post(apiUrl + '/logout', {}, { headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' } });
             console.log('API Response:', response.data);
-            const keysToKeep = ['device_token', 'username', 'password'];
+            const keysToKeep = ['device_token', 'username', 'password','rememberMe'];
             const savedValues = keysToKeep.map(key => ({ key, value: localStorage.getItem(key) }));
             localStorage.clear();
             savedValues.forEach(({ key, value }) => {

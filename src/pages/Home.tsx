@@ -36,7 +36,8 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false); // State for loading spinner
   const [taskList, setTaskList] = useState<[]>([]);
   const [showSyncAlert, setShowSyncAlert] = useState(false);
-
+  const isProd: any = import.meta.env.PROD;
+  
   useEffect(() => {
     const userDataString = localStorage.getItem("userData");
     if (userDataString) {

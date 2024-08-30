@@ -77,6 +77,10 @@ import PestActivityFoundPreview from "../src/pages/PestActivityFoundPreview";
 import ChemicalUsedPreview from "../src/pages/ChemicalUsedPreview";
 import { AuthProvider } from "./components/AuthContext";
 import AuthGuard from "./components/AuthGuard";
+import EnvironmentRibbon from "./components/EnvironmentRibbon";
+
+const apiUrl: any = import.meta.env.VITE_API_URL;
+const isProd: any = import.meta.env.PROD;
 
 setupIonicReact();
 const getUserId = () => {
@@ -133,7 +137,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     registerPushHandlers();
-
     console.log("Checking User session");
     const checkInFlag = localStorage.getItem("checkInFlag");
 
