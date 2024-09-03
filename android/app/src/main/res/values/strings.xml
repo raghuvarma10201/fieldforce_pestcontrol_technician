@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Pest Control Technician App</string>
-    <string name="title_activity_main">Pest Control Technician App</string>
+    <string name="app_name">Fieldforce Technician App</string>
+    <string name="title_activity_main">Fieldforce Technician App</string>
     <string name="package_name">com.fieldforce.technician.app</string>
     <string name="custom_url_scheme">com.fieldforce.technician.app</string>
 </resources>

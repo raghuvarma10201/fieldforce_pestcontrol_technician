@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.fieldforce.technician.app',
-  appName: 'Pest Control Technician App',
+  appName: 'Fieldforce Technician App',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

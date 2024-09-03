@@ -48,7 +48,10 @@ const Dashboard: React.FC = () => {
   const [completedTasks, setCompletedTasks] = useState<number>(0);
   const [expiredTasks, setExpiredTasks] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false); // State for loading spinner
+  const [checkloading, setCheckLoading] = useState<boolean>(false); // State for loading spinner
   const [showAlert, setShowAlert] = useState<boolean>(false); // State for the alert
+  const app_version: any = localStorage.getItem('app_version');
+  const app_name: any = localStorage.getItem('app_name');
   const history = useHistory();
 
   useEffect(() => {
@@ -113,12 +116,16 @@ const Dashboard: React.FC = () => {
     }
   };
   const handleCheckOutClick = async () => {
+    setCheckLoading(true);
     console.log("In handle check click");
     const result = await handleCheckOut();
     if (result.success) {
+      setCheckLoading(false);
       localStorage.removeItem("checkInFlag");
       history.push("/home");
     } else {
+      setCheckLoading(false);
+      toast.error(result.message);
       console.error("Check out failed:", result.message);
     }
   };
@@ -321,7 +328,9 @@ const Dashboard: React.FC = () => {
             </IonText>
           </IonItem>
         </div>
-
+        <IonText className='loginVersion'>
+          <p>App Version &nbsp;{app_version}</p>
+        </IonText>
       </IonContent>
       {/* {!loading && ongoingTaskData ? (
         <IonFooter className="ion-footer onGoingTask">
@@ -343,6 +352,11 @@ const Dashboard: React.FC = () => {
       <IonLoading
         isOpen={loading}
         message={"Syncing up data to server..."}
+        spinner="crescent"
+      />
+      <IonLoading
+        isOpen={checkloading}
+        message={"Loading..."}
         spinner="crescent"
       />
       <IonAlert

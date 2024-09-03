@@ -188,6 +188,7 @@ const TaskDetails: React.FC = () => {
   const startTask = async () => {
     console.log("Start or Continue Task . task data = ", taskDetails);
     try {
+      setLoading(true);
       if (
         taskDetails.service_status.toLowerCase() === "on going" ||
         taskDetails.service_status.toLowerCase() === "paused"
@@ -211,10 +212,11 @@ const TaskDetails: React.FC = () => {
             // toast.error('Server not responding. Please try again later.');
           }
         } catch (error) {
+          setLoading(false);
           console.error("Error:", error);
           // toast.error('Server not responding. Please try again later.');
         }
-
+        setLoading(false);
         history.push("/taskexecution");
       } else if (taskDetails.service_status == "Completed") {
         console.log("taskData.service_status == Completed ");
@@ -236,8 +238,10 @@ const TaskDetails: React.FC = () => {
           }
         } catch (error) {
           console.error("Error:", error);
+          setLoading(false);
           // toast.error('Server not responding. Please try again later.');
         }
+        setLoading(false);
         history.push("/taskexecution");
       } else {
         //pending
@@ -269,11 +273,14 @@ const TaskDetails: React.FC = () => {
           const progressStatus: TaskProgress = setStartStatus("" + taskId);
           console.log("API Response:", data); // Print the response in the console
           if (data.is_chemicals_required) {
+            setLoading(false);
             setShowAlert(true);
           } else {
+            setLoading(false);
             history.push("/taskexecution");
           }
         } else {
+          setLoading(false);
           console.error("Error Checking In ", response);
           setError(data.message);
           if (data.is_chemicals_required) {
@@ -282,6 +289,7 @@ const TaskDetails: React.FC = () => {
         }
       }
     } catch (error) {
+      setLoading(false);
       console.error("Error:", error);
       // toast.error('Server not responding. Please try again later.');
     } finally {

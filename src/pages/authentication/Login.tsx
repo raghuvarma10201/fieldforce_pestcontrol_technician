@@ -37,6 +37,8 @@ const Login: React.FC = () => {
   const [isError, setIsError] = useState(false);
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const app_version: any = localStorage.getItem('app_version');
+  const app_name: any = localStorage.getItem('app_name');
 
   const history = useHistory();
 
@@ -230,6 +232,9 @@ const Login: React.FC = () => {
               {loginMessage}
             </IonText>
           )}
+          <IonText className='loginVersion'>
+            <p>App Version &nbsp;{app_version}</p>
+          </IonText>
         </div>
       </IonContent>
     </IonPage>

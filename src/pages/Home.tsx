@@ -34,8 +34,11 @@ const Home: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false); // State for loading spinner
+  const [checkloading, setCheckLoading] = useState<boolean>(false); // State for loading spinner
   const [taskList, setTaskList] = useState<[]>([]);
   const [showSyncAlert, setShowSyncAlert] = useState(false);
+  const app_version: any = localStorage.getItem('app_version');
+  const app_name: any = localStorage.getItem('app_name');
 
   useEffect(() => {
     const userDataString = localStorage.getItem("userData");
@@ -66,15 +69,20 @@ const Home: React.FC = () => {
 
   const handleCheckIn = async () => {
     try {
+      setCheckLoading(true);
       const { response, data } = await userCheckIn();
+      
       if (response.ok) {
         if (data.is_chemicals_required) {
+          setLoading(false);
           setShowAlert(true);
         } else {
           localStorage.setItem("checkInFlag", "true");
+          setLoading(false);
           history.push("/dashboard");
         }
       } else {
+        setCheckLoading(false);
         setError(data.message);
         if (data.is_chemicals_required) {
           setShowAlert(true);
@@ -269,6 +277,11 @@ const Home: React.FC = () => {
       <IonLoading
         isOpen={loading}
         message={"Syncing up data to server..."}
+        spinner="crescent"
+      />
+      <IonLoading
+        isOpen={checkloading}
+        message={"loading..."}
         spinner="crescent"
       />
       <IonAlert

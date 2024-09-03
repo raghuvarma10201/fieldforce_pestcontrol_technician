@@ -3313,3 +3313,29 @@ text-overflow: ellipsis;
         padding: 3px 6px;
     }
 }
+
+.loginVersionAbsolute{
+    position: fixed;
+    bottom: 0px;
+    color: #000;
+    font-size: smaller;
+    width: 100%;
+    p{
+        text-align: center;
+    }
+  }
+  .loginVersion{
+    padding-top: 50px;
+    color: #000;
+    font-size: smaller;
+    width: 100%;
+    p{
+        margin-top: 45px;
+        text-align: center;
+    }
+  }
+  .loginVersionAdmin{
+    color: #000;
+    font-size: smaller;
+    text-align: center;
+  }

@@ -10,6 +10,7 @@ import {
   IonHeader,
   IonButtons,
   IonTitle,
+  IonFooter,
 } from "@ionic/react";
 import { pencil, arrowBack } from "ionicons/icons";
 import { useHistory } from "react-router";
@@ -20,6 +21,8 @@ const Profile: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [avatar, setAvatar] = useState<string>(AvatarImage);
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+  const app_version: any = localStorage.getItem('app_version');
+  const app_name: any = localStorage.getItem('app_name');
 
   useEffect(() => {
     const userDataString = localStorage.getItem("userData");
@@ -197,6 +200,11 @@ const Profile: React.FC = () => {
           )}
         </div>
       </IonContent>
+      <IonFooter className="ion-footer">
+        <IonText className='loginVersionAbsolute'>
+          <p>App Version &nbsp;{app_version}</p>
+        </IonText>
+      </IonFooter>
     </>
   );
 };

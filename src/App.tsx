@@ -75,6 +75,8 @@ import StockTransferredReceived from "./pages/StockTransferredReceived";
 import StockTransferredDetails from "./pages/StockTransferDetails";
 import PestActivityFoundPreview from "../src/pages/PestActivityFoundPreview";
 import ChemicalUsedPreview from "../src/pages/ChemicalUsedPreview";
+import { App as Appp } from '@capacitor/app';
+import { Device } from "@capacitor/device";
 
 setupIonicReact();
 const getUserId = () => {
@@ -90,6 +92,8 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [position, setPosition] = useState<any>();
+  const [appInfo, setAppInfo] = useState<any>([]);
+  const [appVersion, setAppVersion] = useState<string>('');
   const history = useHistory();
 
   const checkIfLoggedIn = () => {
@@ -128,8 +132,33 @@ const App: React.FC = () => {
       setError("Geolocation Error or user not logged in.");
     }
   };
+  async function handlePlatform() {
+    try {
+      const info = await Device.getInfo();
+      const platform = info.platform;
+      console.log(platform);
+      if (platform === 'ios' || platform === 'android') {
+        console.log('Running on Device');
+        const appInfos = await Appp.getInfo();
+        setAppInfo(appInfos);
+        setAppVersion(appInfos.version);
 
+        localStorage.setItem('app_version', appInfos.version);
+      } else {
+        console.log('Running on Web');
+        setAppInfo([]);
+        localStorage.setItem('app_version', 'web');
+      }
+    } catch (error) {
+      console.error('Error getting device info:', error);
+    } finally {
+      console.log(appInfo);
+      console.log(appVersion);
+    }
+  }
   useEffect(() => {
+    localStorage.setItem('app_name', 'pest_control');
+    handlePlatform();
     registerPushHandlers();
 
     console.log("Checking User session");
