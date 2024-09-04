@@ -77,6 +77,7 @@ import PestActivityFoundPreview from "../src/pages/PestActivityFoundPreview";
 import ChemicalUsedPreview from "../src/pages/ChemicalUsedPreview";
 import { App as Appp } from '@capacitor/app';
 import { Device } from "@capacitor/device";
+import NetworkSpeedCheck from "./components/NetworkSpeedCheck";
 
 setupIonicReact();
 const getUserId = () => {
@@ -181,6 +182,7 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <ToastContainer />
+      <NetworkSpeedCheck/>
       <IonReactRouter>
         <IonRouterOutlet>
           <Switch>

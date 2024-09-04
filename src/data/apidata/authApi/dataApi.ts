@@ -36,10 +36,12 @@ export const userCheckIn = async () => {
 
   // Get current location
   const pos = await getCurrentLocation();
+  console.log(pos);
   if (!pos) {
     console.error("Error fetching Location");
-    throw new Error("Failed to fetch Location");
-    //return { success: false, message: 'Failed to fetch Location'};
+    const response = {ok : false};
+    const data = {message : 'Failed to fetch Location'}
+    return { response, data };
   }
 
   try {
@@ -123,7 +125,9 @@ export const handleCheckOut = async () => {
   const pos = await getCurrentLocation();
   if (!pos) {
     console.error("Error fetching Location");
-    throw new Error("Failed to fetch Location");
+    const response = {ok : false};
+    const data = {message : 'Failed to fetch Location'}
+    return { response, data };
   }
   const payload = {
     type: 2, // 1-CHECK_IN, 2-CHECK_OUT
