@@ -292,11 +292,13 @@ const TaskExecution: React.FC = () => {
       throw new Error("Task data is not available");
     }
     let activeTaskData = JSON.parse(taskDataStr);
-    activeTaskData = [activeTaskData];
+
+    //activeTaskData = [activeTaskData];
+    console.log(activeTaskData);
     const taskId = activeTaskData.id; // Assuming the task ID is in the first element
 
     // Navigate to task details page when Cancel button is clicked
-    history.push(`/task/${taskId}`);
+    history.push(`/tasks/${taskId}`);
   };
 
   const visitId = activeTaskData.id;
@@ -654,10 +656,13 @@ const TaskExecution: React.FC = () => {
                 },
               ]}
             ></IonAlert>
+
+            <div className="cardTaskExe">
             <IonCard className="card card-active">
               <h3>Service Request is Started</h3>
               <h6>{taskStartTime}</h6>
             </IonCard>
+
             <IonCard
               className={
                 taskProgress?.teamAttendance === -1
@@ -674,9 +679,10 @@ const TaskExecution: React.FC = () => {
                 }
               }}
               id="present-alert"
-            >
+              >
               <h3>Team Attendance</h3>
             </IonCard>
+
             <IonCard
               className={
                 taskProgress?.travelStart === -1 &&
@@ -687,7 +693,7 @@ const TaskExecution: React.FC = () => {
                     ? "card card-active"
                     : "card"
               }
-            >
+             >
               <h3>Track Travel Time</h3>
               {!isTravelStartEnable ? (
                 <h6>Start Time: {travelStartTime}</h6>
@@ -700,6 +706,7 @@ const TaskExecution: React.FC = () => {
                 <h6>End Time: {travelEndTime}</h6>
               )}
             </IonCard>
+
             <IonCard
               className={
                 taskProgress?.pestActivityDiscov === -1
@@ -733,10 +740,11 @@ const TaskExecution: React.FC = () => {
                   history.push("/PestActivityFound");
                 }
               }}
-            >
+              >
               <h3>Pest Activity Found Details</h3>
               <h6>House Flies, House Mice</h6>
             </IonCard>
+
             <IonCard
               className={
                 taskProgress?.chemicalsUsed === -1
@@ -771,10 +779,11 @@ const TaskExecution: React.FC = () => {
                   history.push("/chemicalUsed");
                 }
               }}
-            >
+              >
               <h3>Chemical Used</h3>
               <h6>Advion Ant Gel, Ant Bait Station … View Details</h6>
             </IonCard>
+
             <IonCard
               className={
                 taskProgress?.recommGiven === -1
@@ -811,10 +820,11 @@ const TaskExecution: React.FC = () => {
                   history.push("/Recommendations");
                 }
               }}
-            >
+              >
               <h3>Recommendations</h3>
               <h6>Keep the manholes close after the treatment</h6>
             </IonCard>
+
             <IonCard
               className={
                 taskProgress?.workDoneDetails === -1
@@ -834,33 +844,34 @@ const TaskExecution: React.FC = () => {
                   history.push("/WorkDoneDetails");
                 }
               }}
-            >
+              >
               <h3>Work Done Details</h3>
             </IonCard>
+
             <IonCard
-              className={
-                taskProgress?.feedBack === -1
-                  ? "card"
-                  : taskProgress?.feedBack === 1
-                    ? "card card-active"
-                    : "card"
-              }
-              onClick={() => {
-                if (taskProgress?.feedBack === -1 && isPaused) {
-                  toast.info("Please resume the task to perform the action");
-                } else if (
-                  taskProgress?.workDoneDetails === ProgressStatus.done &&
-                  taskProgress?.feedBack != ProgressStatus.done &&
-                  !(taskProgress?.feedBack === -1 && isPaused)
-                ) {
-                  history.push("/FeedbackFollowup");
+                className={
+                  taskProgress?.feedBack === -1
+                    ? "card"
+                    : taskProgress?.feedBack === 1
+                      ? "card card-active"
+                      : "card"
                 }
-              }}
-            >
+                onClick={() => {
+                  if (taskProgress?.feedBack === -1 && isPaused) {
+                    toast.info("Please resume the task to perform the action");
+                  } else if (
+                    taskProgress?.workDoneDetails === ProgressStatus.done &&
+                    taskProgress?.feedBack != ProgressStatus.done &&
+                    !(taskProgress?.feedBack === -1 && isPaused)
+                  ) {
+                    history.push("/FeedbackFollowup");
+                  }
+                }}
+              >
               <h3>Feedback And Follow-up</h3>
               <h6>Very Good</h6>
             </IonCard>
-
+          </div>
           </div>
         </div>
         <FullScreenLoader isLoading={submitting} />
