@@ -52,8 +52,7 @@ const ApplyLeave = () => {
     }
   }, [location.state, setValue]);
 
-  const [leaveTypes, setLeaveTypes] = useState<
-    { id: string; leave_type_name: string }[]
+  const [leaveTypes, setLeaveTypes] = useState<any[]
   >([]);
   const [leaveStartDate, setLeaveStartDate] = useState("");
   const [leaveEndDate, setLeaveEndDate] = useState("");
@@ -109,9 +108,10 @@ const ApplyLeave = () => {
 
   useEffect(() => {
     if (userData) {
-      fetchLeaveTypes().then((data) => {
-        if (data) {
-          setLeaveTypes(data);
+      fetchLeaveTypes().then((data : any) => {
+        if (data.data) {
+          console.log(data.data);
+          setLeaveTypes(data.data);
         }
       });
     }
@@ -139,7 +139,7 @@ const ApplyLeave = () => {
       // Ensure dayType is included in data
       data.dayType = watch("dayType");
   
-      const response = await submitLeaveApply(data);
+      const response : any  = await submitLeaveApply(data);
       if (response.success) {
         toast.success(response.message);
         console.log("Leave application submitted successfully!");
@@ -204,7 +204,7 @@ const ApplyLeave = () => {
                       },
                     })}
                   >
-                    {leaveTypes.map((leaveType) => (
+                    {leaveTypes.map((leaveType : any) => (
                       <IonSelectOption key={leaveType.id} value={leaveType.id}>
                         {leaveType.leave_type_name}
                       </IonSelectOption>

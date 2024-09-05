@@ -22,7 +22,7 @@ import {
 import { useParams, useHistory } from "react-router-dom";
 import { ellipse, sync, time } from "ionicons/icons";
 
-import { visitStatusCount } from "../data/apidata/taskApi/taskDataApi";
+import { getVisitExecutionDetails, visitStatusCount } from "../data/apidata/taskApi/taskDataApi";
 import { handleCheckOut } from "../data/apidata/authApi/dataApi";
 import { retrieveNetworkTasks } from "../data/offline/entity/DataRetriever";
 import MenuAction from "../components/MenuAction";
@@ -37,7 +37,11 @@ import {
   retrieveNetworkTasksDetails,
   retrieveNetworkTasksExecutionDetails,
 } from "../data/offline/entity/DataRetriever";
-import TaskProgress, { saveTaskProgress, updateTaskProgressStatusFromExecDetails } from "../data/localstorage/taskStatusStorage";
+import TaskProgress, { saveTaskProgress, setStartStatus, updateTaskProgressStatusFromExecDetails } from "../data/localstorage/taskStatusStorage";
+import { getDateTime } from "../utils/dateTimeUtils";
+import { submitTaskStart } from "../data/offline/entity/DataTransfer";
+
+const isProd: any = import.meta.env.PROD;
 
 const Dashboard: React.FC = () => {
   const { taskId } = useParams<{ taskId: string }>();
@@ -108,7 +112,7 @@ const Dashboard: React.FC = () => {
       );
 
       let ongoingTask = rawTaskList.find((task: any) => task.service_status === "On Going")
-
+      
 
       setLoading(false);
       setOnGoingTaskData(ongoingTask);
@@ -137,6 +141,109 @@ const Dashboard: React.FC = () => {
     setShowAlert(true); // Show the confirmation alert
   };
   const startTask = async () => {
+    localStorage.setItem("activeTaskData", JSON.stringify(ongoingTaskData));
+    console.log("Start or Continue Task . task data = ", ongoingTaskData);
+    try {
+      if (
+        ongoingTaskData.service_status.toLowerCase() === "on going" ||
+        ongoingTaskData.service_status.toLowerCase() === "paused"
+      ) {
+        console.log("taskData.service_status == On Going ");
+        try {
+          const { response, data } = await retrieveNetworkTasksExecutionDetails(
+            ongoingTaskData.id
+          );
+          if (response.ok) {
+            console.log("Visit Execution Details ::", data.data);
+            const updatedTaskProgress: TaskProgress =
+              updateTaskProgressStatusFromExecDetails(
+                ongoingTaskData.id,
+                data.data
+              );
+            console.log("final progressStatus of task:", updatedTaskProgress);
+            if (updatedTaskProgress) saveTaskProgress(updatedTaskProgress);
+          } else {
+            console.error(data.message);
+            // toast.error('Server not responding. Please try again later.');
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          // toast.error('Server not responding. Please try again later.');
+        }
+
+        history.push("/taskexecution");
+      } else if (ongoingTaskData.service_status == "Completed") {
+        console.log("taskData.service_status == Completed ");
+        try {
+          const { response, data } = await getVisitExecutionDetails(
+            ongoingTaskData.id
+          );
+          if (response.ok) {
+            console.log("Visit Execution Details ::", data.data);
+            const updatedTaskProgress: TaskProgress =
+              updateTaskProgressStatusFromExecDetails(
+                ongoingTaskData.id,
+                data.data
+              );
+            if (updatedTaskProgress) saveTaskProgress(updatedTaskProgress);
+          } else {
+            console.error(data.message);
+            // toast.error('Server not responding. Please try again later.');
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          // toast.error('Server not responding. Please try again later.');
+        }
+        history.push("/taskexecution");
+      } else {
+        //pending
+        console.log("taskData.service_status == Pending ");
+        const formattedDate = getDateTime();
+
+        // const { response, data } = await taskInit(
+        //   taskDetails.id,
+        //   formattedDate,
+        //   "Service Request Start",
+        //   "Service Initiated"
+        // );
+        const { response, data } = await submitTaskStart(
+          ongoingTaskData.id,
+          formattedDate,
+          "Service Request Start",
+          "Service Initiated"
+        );
+
+        console.log(
+          "Response from API:----------------------------------->",
+          response
+        );
+        console.log(
+          "Response from API:----------------------------------->",
+          data
+        );
+        if (response.ok) {
+          const progressStatus: TaskProgress = setStartStatus("" + taskId);
+          console.log("API Response:", data); // Print the response in the console
+          if (data.is_chemicals_required) {
+            setShowAlert(true);
+          } else {
+            history.push("/taskexecution");
+          }
+        } else {
+          console.error("Error Checking In ", response);
+          //setError(data.message);
+          if (data.is_chemicals_required) {
+            setShowAlert(true);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      // toast.error('Server not responding. Please try again later.');
+    } finally {
+    }
+  };
+  const startTsask = async () => {
     console.log("taskData.service_status == On Going ");
     try {
       const { response, data } = await retrieveNetworkTasksExecutionDetails(
@@ -159,8 +266,15 @@ const Dashboard: React.FC = () => {
       console.error("Error:", error);
       // toast.error('Server not responding. Please try again later.');
     }
-
-    history.push("/taskexecution");
+    try {
+      const taskDetails = await retrieveNetworkTasksDetails(taskId);
+      localStorage.setItem("activeTaskData", JSON.stringify(taskDetails));
+      history.push("/taskexecution");
+    } catch (error) {
+      console.error("Error fetching task details:", error);
+      toast.error("Server not responding. Please try again later.");
+    }
+    
 
   };
   const handleConfirmSync = async (confirm: boolean) => {
@@ -332,7 +446,7 @@ const Dashboard: React.FC = () => {
           <p>App Version &nbsp;{app_version}</p>
         </IonText>
       </IonContent>
-      {/* {!loading && ongoingTaskData ? (
+      {!loading && ongoingTaskData ? (
         <IonFooter className="ion-footer onGoingTask">
           <IonToolbar>
             <div className="ion-float-start" slot="start">
@@ -347,7 +461,7 @@ const Dashboard: React.FC = () => {
         </IonFooter>
       ) : (
         ""
-      )} */}
+      )}
 
       <IonLoading
         isOpen={loading}

@@ -37,6 +37,8 @@ export const registerPushHandlers = async () => {
             console.log('PUSH :::: Push notification action performed', notification.actionId, notification.inputValue);
             window.location.href = '/notification';
         });
+    }else{
+        localStorage.setItem("device_token", "qwerty");
     }
 }
 

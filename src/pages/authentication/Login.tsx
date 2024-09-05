@@ -19,16 +19,20 @@ import {
 } from "@ionic/react";
 import { useHistory } from "react-router";
 import { toast } from "react-toastify";
-import { loginApi, userCheckIn, userCheckIns } from "../../data/apidata/authApi/dataApi";
+import { userCheckIn, userCheckIns } from "../../data/apidata/authApi/dataApi";
 import "react-toastify/dist/ReactToastify.css";
 import { registerDevice } from "../../utils/pushNotiications";
 import { eye, eyeOff } from "ionicons/icons"; // Import icons
+import { useAuth } from '../../components/AuthContext';
+import EnvironmentRibbon from "../../components/EnvironmentRibbon";
 
+const isProd: any = import.meta.env.PROD;
 
 const Login: React.FC = () => {
   const logo = "assets/images/logo-login.svg";
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useAuth();
   const [loginMessage, setLoginMessage] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,38 +81,33 @@ const Login: React.FC = () => {
 
     if (username && password) {
       try {
-        const { response, data } = await loginApi(username, password); // Call loginApi function
-        console.log(response);
-        console.log(data.data[0]);
-
-        const userData = data.data[0];
-        if (response.ok) {
+        const response = await login(username, password); // Call loginApi function
+        if (response.data.status == 200 && response.data.success == true) {
+          console.log("hi")
+          toast.success(response.data.message);
+          console.log(response.data.data[0].role_name, "rolename");
+          const userData = response.data.data[0]
           if (userData.last_action === "1") {
             try {
               await userCheckIns(userData);
-              localStorage.setItem("userData", JSON.stringify(userData));
-            history.push("/dashboard");
-           
+              //localStorage.setItem("userData", JSON.stringify(userData));
+              history.push("/dashboard");
+
             } catch (error) {
               console.error("Error during check-in:", error);
             }
-        
-            
+
+
           } else {
-            localStorage.setItem("userData", JSON.stringify(data.data[0]));
-            console.log(data);
+            localStorage.setItem("userData", JSON.stringify(response.data.data[0]));
             history.push("/home");
           }
-        } else {
-          if (data.error === "username") {
-            setLoginMessage("Username is incorrect.");
-          } else if (data.error === "password") {
-            setLoginMessage("Password is incorrect.");
-          } else {
-            setLoginMessage(data.message);
-          }
-          toast.error(data.message, { autoClose: 3000 });
         }
+        else {
+          // console.log(response.message)
+          toast.error(response.data.message);
+        }
+
       } catch (error) {
         console.error("Error:", error);
       } finally {
@@ -157,7 +156,9 @@ const Login: React.FC = () => {
 
   return (
     <IonPage>
+      
       <IonContent fullscreen className="ion-login">
+        {!isProd && <EnvironmentRibbon position="ribbon top-right"/>}
         {loading && <IonProgressBar type="indeterminate" color="success" />}
         <div className="loginwrapp">
           <IonImg
@@ -172,8 +173,8 @@ const Login: React.FC = () => {
           </IonText>
           <form onSubmit={handleLogin}>
             <IonLabel className="ion-label">Email / Employee ID</IonLabel>
-            <div className="ionItemInput ion-margin-bottom">  
-            <IonImg className="loginImgInput" src="assets/images/login-email-icon.svg"></IonImg>     
+            <div className="ionItemInput ion-margin-bottom">
+              <IonImg className="loginImgInput" src="assets/images/login-email-icon.svg"></IonImg>
               <IonInput
                 placeholder="Email"
                 value={username}
@@ -184,8 +185,8 @@ const Login: React.FC = () => {
             {usernameError && <IonText color="danger">{usernameError}</IonText>}
 
             <IonLabel className="ion-label">Password</IonLabel>
-            <div className="ionItemInput">  
-            <IonImg className="loginImgInput" src="assets/images/login-password-icon.svg"></IonImg>    
+            <div className="ionItemInput">
+              <IonImg className="loginImgInput" src="assets/images/login-password-icon.svg"></IonImg>
               <IonInput
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
@@ -197,7 +198,7 @@ const Login: React.FC = () => {
                 slot="end"
                 icon={showPassword ? eye : eyeOff}
                 onClick={togglePasswordVisibility}
-                style={{ cursor: "pointer",}}
+                style={{ cursor: "pointer", }}
               />
             </div>
             {passwordError && <IonText color="danger">{passwordError}</IonText>}

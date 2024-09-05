@@ -298,7 +298,7 @@ const TaskExecution: React.FC = () => {
     const taskId = activeTaskData.id; // Assuming the task ID is in the first element
 
     // Navigate to task details page when Cancel button is clicked
-    history.push(`/tasks/${taskId}`);
+    history.push(`/task/${taskId}`);
   };
 
   const visitId = activeTaskData.id;

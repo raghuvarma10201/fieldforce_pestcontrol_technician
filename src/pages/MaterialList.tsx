@@ -64,16 +64,16 @@ const MaterialList: React.FC = () => {
       const activeTaskData = JSON.parse(taskDataStr);
       const taskId = activeTaskData.id; // Assuming the task ID is in the first element
 
-      const { response, data } = await taskInit(
+      const response = await taskInit(
         taskId,
         formattedDate,
         "Service Request Start",
         "Service Initiated"
       );
 
-      if (response.ok) {
-        console.log("Response Data:", data);
-        const itemsData = data.data;
+      if (response) {
+        console.log("Response Data:", response.data);
+        const itemsData = response.data;
         setMaterials(itemsData);
         console.log("data for chemicals");
       } else {

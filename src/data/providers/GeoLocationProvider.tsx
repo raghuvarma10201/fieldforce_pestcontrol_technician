@@ -70,7 +70,7 @@ export const getCurrentLocation = async () => {
       return position;
     } 
   } catch (e) {
-    console.log("Geolocation Error or user not logged in.");
+    console.log(e);
     return null;
   }
 }

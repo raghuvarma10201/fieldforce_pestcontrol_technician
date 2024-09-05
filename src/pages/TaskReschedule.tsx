@@ -123,7 +123,7 @@ const TaskReschedule: React.FC = () => {
   return (
     <>
       {/* <CommonHeader
-        backToPath={"/tasks/" + activeTaskData.id}
+        backToPath={"/task/" + activeTaskData.id}
         pageTitle={"Task Reschedule"}
         showIcons={false}
       /> */}

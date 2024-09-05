@@ -47,6 +47,8 @@ import { Network } from "@capacitor/network";
 import { submitTaskStart } from "../data/offline/entity/DataTransfer";
 import { toast } from "react-toastify";
 import NotificationLength from "../components/NotificationLength";
+
+
 const TaskDetails: React.FC = () => {
   const params: any = useParams();
   // const { id } = useParams<{ id: string }>(); // Dynamically fetch taskId from URL
@@ -63,12 +65,14 @@ const TaskDetails: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
+    console.log('ddd');
     loadTaskFromParams();
     fetchTDetails(taskId);
     // fetchTaskDetails(taskId)
   }, []); // Execute useEffect whenever taskId changes
 
   const fetchTDetails = async (taskId: any) => {
+    
     console.log("Going to fetch Task Details for task ID ::::", taskId);
     setLoading(true); // Start loading
 
@@ -104,7 +108,7 @@ const TaskDetails: React.FC = () => {
   };
 
   const loadTaskFromParams = () => {
-    // console.log("id from params = ", id);
+    console.log("##########################################");
     console.log("LOADING task ID from params = ", params);
     console.log("params wise task id ", params.taskId);
     // setActiveTaskId(params.id)
@@ -254,7 +258,7 @@ const TaskDetails: React.FC = () => {
         //   "Service Request Start",
         //   "Service Initiated"
         // );
-        const { response, data } = await submitTaskStart(
+        const response= await submitTaskStart(
           taskDetails.id,
           formattedDate,
           "Service Request Start",
@@ -267,14 +271,14 @@ const TaskDetails: React.FC = () => {
         );
         console.log(
           "Response from API:----------------------------------->",
-          data
+          response.data
         );
-        if (response.ok) {
+        if (response.success) {
           const progressStatus: TaskProgress = setStartStatus("" + taskId);
-          console.log("API Response:", data); // Print the response in the console
-          if (data.is_chemicals_required) {
-            setLoading(false);
+          console.log("API Response:", response.data); // Print the response in the console
+          if (response.is_chemicals_required) {
             setShowAlert(true);
+            //history.push("/taskexecution");
           } else {
             setLoading(false);
             history.push("/taskexecution");
@@ -282,8 +286,8 @@ const TaskDetails: React.FC = () => {
         } else {
           setLoading(false);
           console.error("Error Checking In ", response);
-          setError(data.message);
-          if (data.is_chemicals_required) {
+          setError(response.message);
+          if (response.is_chemicals_required) {
             setShowAlert(true);
           }
         }

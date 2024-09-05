@@ -40,6 +40,8 @@ const Home: React.FC = () => {
   const app_version: any = localStorage.getItem('app_version');
   const app_name: any = localStorage.getItem('app_name');
 
+  const isProd: any = import.meta.env.PROD;
+  
   useEffect(() => {
     const userDataString = localStorage.getItem("userData");
     if (userDataString) {
