@@ -191,6 +191,7 @@ const App: React.FC = () => {
       <ToastContainer />
       <AuthProvider>
         <IonReactRouter>
+        <NetworkSpeedCheck/>
           <IonRouterOutlet>
             <Switch>
               <Route exact path="/">

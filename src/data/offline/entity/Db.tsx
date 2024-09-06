@@ -1,7 +1,7 @@
 import { IonButton, IonText, IonImg } from "@ionic/react";
 import { Storage } from "@ionic/storage";
 import { useEffect, useState } from "react";
-import { API_BASE_URL } from "../../baseUrl"; // Assuming API_BASE_URL is defined correctly
+//import { API_BASE_URL } from "../../baseUrl"; // Assuming API_BASE_URL is defined correctly
 import { getCurrentLocation } from "../../providers/GeoLocationProvider";
 import { set } from "lodash";
 import { toZonedTime, format } from "date-fns-tz";
@@ -20,7 +20,7 @@ const Db: React.FC = () => {
     }
     initDb();
   }, []);
-
+  const API_BASE_URL: any = import.meta.env.VITE_API_URL;
   // =====================task-list=====================
 
   const fetchTaskList = async () => {

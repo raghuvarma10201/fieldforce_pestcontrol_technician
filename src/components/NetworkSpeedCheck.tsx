@@ -35,8 +35,7 @@ const NetworkSpeedCheck: React.FC = () => {
     // Check the network status initially
     checkNetworkStatus();
 
-    // Set up an interval to check network status every 10 seconds
-    const interval = setInterval(checkNetworkStatus, 60000);
+
 
     // Add a listener to monitor network status changes
     const handleNetworkChange = (status: any) => {
@@ -48,8 +47,7 @@ const NetworkSpeedCheck: React.FC = () => {
 
     // Cleanup the interval and listener on component unmount
     return () => {
-      clearInterval(interval);
-
+      
     };
   }, []);
   return (

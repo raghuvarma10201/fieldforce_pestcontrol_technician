@@ -23,9 +23,7 @@ export const userCheckIn = async () => {
   console.log(pos);
   if (!pos) {
     console.error("Error fetching Location");
-    const response = {ok : false};
-    const data = {message : 'Failed to fetch Location'}
-    return { response, data };
+    return;
   }
   try {
     const requestBody = {

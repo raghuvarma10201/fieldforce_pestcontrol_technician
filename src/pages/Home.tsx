@@ -72,10 +72,10 @@ const Home: React.FC = () => {
   const handleCheckIn = async () => {
     try {
       setCheckLoading(true);
-      const { response, data } = await userCheckIn();
+      const response= await userCheckIn();
       
-      if (response.ok) {
-        if (data.is_chemicals_required) {
+      if (response) {
+        if (response.is_chemicals_required) {
           setLoading(false);
           setShowAlert(true);
         } else {
@@ -85,8 +85,8 @@ const Home: React.FC = () => {
         }
       } else {
         setCheckLoading(false);
-        setError(data.message);
-        if (data.is_chemicals_required) {
+        setError(response.message);
+        if (response.is_chemicals_required) {
           setShowAlert(true);
         }
       }

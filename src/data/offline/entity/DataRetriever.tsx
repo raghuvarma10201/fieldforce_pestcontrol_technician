@@ -17,7 +17,7 @@ import {
 } from "../../apidata/taskApi/taskDataApi";
 import { fetchIdealTechnicians, submitTechnicianData } from "../../apidata/technicianData/idealTechnicianData";
 import { anyUpSyncPending } from "./DataTransfer";
-import { API_BASE_URL } from "../../baseUrl";
+//import { API_BASE_URL } from "../../baseUrl";
 let storage = new Storage();
 
 let syncstatus = {
@@ -26,6 +26,7 @@ let syncstatus = {
   touchedTasks: [],
 };
 
+const API_BASE_URL: any = import.meta.env.VITE_API_URL;
 // ==================================otx-task===========================================
 
 const getOnGoingNPendingTasks = async (
