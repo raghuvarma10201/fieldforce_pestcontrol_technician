@@ -12,11 +12,12 @@ import {
 } from "../../apidata/taskApi/taskDataApi";
 import { getCurrentLocation } from "../../providers/GeoLocationProvider";
 import { Network } from "@capacitor/network";
-import { API_BASE_URL } from "../../baseUrl";
 import { submitTechnicianData } from "../../apidata/technicianData/idealTechnicianData";
 import { formatDateTime, getDateTime } from "../../../utils/dateTimeUtils";
 import { toZonedTime, format } from "date-fns-tz";
 import { toast } from "react-toastify";
+
+const apiUrl: any = import.meta.env.VITE_API_URL;
 
 let storage: Storage;
 
@@ -1362,7 +1363,7 @@ export const updateInterval = async (visitId: any, isPaused: any) => {
     if (nwStatus.connected && !anyOtxPending) {
       console.log("intervals--------> online");
       // If online
-      const response = await fetch(`${API_BASE_URL}/visit-time-intervals`,
+      const response = await fetch(`${apiUrl}/visit-time-intervals`,
         {
           method: "POST",
           headers: {

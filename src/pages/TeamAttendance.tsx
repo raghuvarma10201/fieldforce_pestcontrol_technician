@@ -59,6 +59,7 @@ const TeamAttendance: React.FC = () => {
   const Location = useLongitudeLocation();
   const [baseImage, setBaseImage] = useState<any>(null);
   const { techniciansRequired } = useParams<{ techniciansRequired: string }>();
+  const [cameraFormat, setCameraFormat] = useState<string>("1");
   const [isImageUploaded, setIsImageUploaded] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const history = useHistory();
@@ -166,12 +167,22 @@ const TeamAttendance: React.FC = () => {
   // =========================Photo Capture==========================
 
   const capturePhoto = async () => {
+    let cameraSource : any = null;
+    if(cameraFormat === '0'){
+      cameraSource = CameraSource.Camera;
+    }else if(cameraFormat === '1'){
+      cameraSource = CameraSource.Photos;
+    }else if(cameraFormat === '2'){
+      cameraSource = CameraSource.Prompt;
+    }else{
+      cameraSource = CameraSource.Prompt;
+    }
     console.log("Launching camera");
     const image = await Camera.getPhoto({
       quality: 25,
       allowEditing: false,
       saveToGallery: false,
-      source: CameraSource.Camera,
+      source: cameraSource,
       direction: CameraDirection.Rear,
       resultType: CameraResultType.Base64,
     });

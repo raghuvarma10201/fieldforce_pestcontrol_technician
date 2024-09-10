@@ -20,10 +20,12 @@ import { useHistory } from "react-router";
 import { useState, useEffect } from "react";
 import CommonHeader from "../components/CommonHeader";
 import useLongitudeLocation from "../components/useLongitudeLocation";
-import { API_BASE_URL } from "../data/baseUrl";
+//import { API_BASE_URL } from "../data/baseUrl";
 import { toast } from "react-toastify";
 import moment from "moment-timezone";
 import { ellipse } from "ionicons/icons";
+const apiUrl: any = import.meta.env.VITE_API_URL;
+
 const TaskReschedule: React.FC = () => {
   const location = useLongitudeLocation();
   const history = useHistory();
@@ -87,7 +89,7 @@ const TaskReschedule: React.FC = () => {
         reschedule_notes: rescheduleNotes,
       });
 
-      const response = await fetch(`${API_BASE_URL}/reschedule-visit`, {
+      const response = await fetch(`${apiUrl}/reschedule-visit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

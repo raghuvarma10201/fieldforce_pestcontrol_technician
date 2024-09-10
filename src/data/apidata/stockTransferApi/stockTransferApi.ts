@@ -1,6 +1,4 @@
 import axiosInstance from "../../../components/ApiInterceptor";
-import { API_BASE_URL } from "../../baseUrl";
-
 
 const apiUrl: any = import.meta.env.VITE_API_URL;
 
