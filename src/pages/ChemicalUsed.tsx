@@ -590,7 +590,7 @@ const ChemicalUsed = () => {
     const willReset = await swal({
       title: "Are you sure?",
       text: "Do you want to reset all changes? This action cannot be undone.",
-      buttons: ["Cancel", "OK"],
+      buttons: ["Cancel", "Ok"],
     });
 
     // If the user confirms, proceed with the reset

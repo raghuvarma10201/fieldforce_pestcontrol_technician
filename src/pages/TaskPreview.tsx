@@ -256,7 +256,7 @@ const TaskPreview: React.FC = () => {
             ) : null}
           </IonCard>
 
-          <IonCard className="ion-padding-horizontal">
+          <IonCard className="ion-padding-horizontal preTaskInitiation">
             <IonText className="previewHeading">
               <h2>Task Initiation</h2>
             </IonText>
@@ -268,15 +268,16 @@ const TaskPreview: React.FC = () => {
                   <IonCard key={index}>
                     <IonText>
                       <p>
-                        Date and Time:{" "}
+                        Date and Time: <span>{" "}
                         {formatDate(initiation?.date_time) +
                           " " +
                           formatTime(initiation?.date_time)}
+                          </span>
                       </p>
-                      <p>Log Type: {initiation?.log_type}</p>
-                      <p>Tracking Type: {initiation?.tracking_type}</p>
-                      <p>Latitude: {initiation?.latitude}</p>
-                      <p>Longitude: {initiation?.longitude}</p>
+                      <p>Log Type: <span>{initiation?.log_type}</span></p>
+                      <p>Tracking Type: <span>{initiation?.tracking_type}</span></p>
+                      <p>Latitude: <span>{initiation?.latitude}</span></p>
+                      <p>Longitude: <span>{initiation?.longitude}</span></p>
                     </IonText>
                   </IonCard>
                 )

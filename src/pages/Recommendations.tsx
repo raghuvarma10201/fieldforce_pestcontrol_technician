@@ -658,7 +658,7 @@ const Recommendations = () => {
     const willReset = await swal({
       title: "Are you sure?",
       text: "Do you want to reset the form? All changes will be lost.",
-      buttons: ["Cancel", "OK"],
+      buttons: ["Cancel", "Ok"],
     });
 
     // If the user confirms, reset the form fields
