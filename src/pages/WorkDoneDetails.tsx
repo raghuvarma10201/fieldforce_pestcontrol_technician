@@ -28,7 +28,6 @@ import {
   updateTaskStatus,
 } from "../data/localstorage/taskStatusStorage";
 import useLongitudeLocation from "../components/useLongitudeLocation";
-import { API_BASE_URL } from "../data/baseUrl";
 import {
   fetchQuestionnaire,
   submitWorkDoneDetail,

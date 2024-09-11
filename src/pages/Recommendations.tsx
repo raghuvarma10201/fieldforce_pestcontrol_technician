@@ -36,7 +36,6 @@ import {
   CameraSource,
 } from "@capacitor/camera";
 import { Capacitor } from "@capacitor/core";
-import { API_BASE_URL } from "../data/baseUrl";
 import {
   ProgressStatus,
   updateTaskStatus,

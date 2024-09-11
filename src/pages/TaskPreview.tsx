@@ -28,7 +28,6 @@ import CommonHeader from "../components/CommonHeader";
 import { useEffect, useState, useRef } from "react";
 import { object, string } from "yup";
 import FeedbackFollowup from "./FeedbackFollowup";
-import { API_BASE_URL } from "../data/baseUrl";
 import { fetchvisitExecutionpreview } from "../data/apidata/taskApi/taskDataApi";
 import { retrievevisitExecutionDetailsBasedonNetwork } from "../data/offline/entity/DataRetriever";
 import { toast, ToastContainer } from "react-toastify";
