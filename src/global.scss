@@ -129,6 +129,7 @@
   
   .ion-button {
     border-radius: 6px;
+    --border-radius:6px;
     font-weight: 600;
   }
   
@@ -924,6 +925,13 @@
     }
   }
   
+  .preTaskInitiation{
+    padding-top:0px !important;
+    p{
+        span{font-weight:500; color:#000;}
+    }
+  }
+
   .serviceRequestStatus {
     display: inline-block;
     width: 100%;
@@ -3339,5 +3347,40 @@
       font-size: smaller;
       text-align: center;
     }
-  
-  
+¯  
+  .ios 
+  {
+            .stockIonSegmentButton ion-segment-button{--color-checked:#fff;}
+
+        .stockIonSegmentButton ion-segment-button ion-badge{
+            background: #ffffff;
+            color: #2c2c2c;
+        }
+        .alert-button-group .alert-button{margin:0px 10px; font-size: 0.86rem;     height: 36px;}
+        .alert-button-group{padding-bottom:15px !important;}
+        ion-header {
+            ion-title{
+                text-align: start;
+                margin-left: 44px;
+            }
+        }
+
+        .ion-footer .ionFooterTwoButtons .ion-button{
+            margin-left: 5px;
+            margin-right: 5px;
+            width: 46%;
+            padding:0px;
+        }
+
+        .previewWrpp {
+
+          ion-card {
+            padding-bottom:0px;
+            padding-top:0px;
+            ion-card{background: #fef5f1;} 
+          }
+            .list-ios{padding-bottom: 20px; padding-top:0px;}
+
+        }
+  }
+

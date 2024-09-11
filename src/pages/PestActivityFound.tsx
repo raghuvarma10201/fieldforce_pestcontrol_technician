@@ -496,7 +496,7 @@ const PestActivityFound: React.FC = () => {
     const willReset = await swal({
       title: "Are you sure?",
       text: "Do you want to reset the form? This action cannot be undone.",
-      buttons: ["Cancel", "OK"],
+      buttons: ["Cancel", "Ok"],
     });
 
     // If the user confirms, reset the form fields
