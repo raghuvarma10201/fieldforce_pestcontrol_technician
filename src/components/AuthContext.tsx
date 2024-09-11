@@ -80,7 +80,6 @@ export const AuthProvider: React.FC<any> = ({ children }) => {
        
     const logout = async () => {
         try {
-            alert('ddd');
             const response = await axiosInstance.post(apiUrl + '/logout', {}, { headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' } });
             console.log('API Response:', response.data);
             const keysToKeep = ['device_token', 'username', 'password','rememberMe'];
