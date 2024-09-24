@@ -38,7 +38,7 @@ import {
   ProgressStatus,
   updateTaskStatus,
 } from "../data/localstorage/taskStatusStorage";
-import { API_BASE_URL } from "../data/baseUrl";
+
 import { getCurrentLocation } from "../data/providers/GeoLocationProvider";
 import FullScreenLoader from "../components/FullScreenLoader";
 import "./ChemicalUsed.css";
@@ -590,7 +590,7 @@ const ChemicalUsed = () => {
     const willReset = await swal({
       title: "Are you sure?",
       text: "Do you want to reset all changes? This action cannot be undone.",
-      buttons: ["Cancel", "OK"],
+      buttons: ["Cancel", "Ok"],
     });
 
     // If the user confirms, proceed with the reset

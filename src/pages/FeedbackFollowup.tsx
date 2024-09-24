@@ -222,7 +222,7 @@ const FeedbackFollowup: React.FC = () => {
     swal({
       title: "Reset Form?",
       text: "Are you sure you want to reset the form? All unsaved changes will be lost.",
-      buttons: ["Cancel", "OK"],
+      buttons: ["Cancel", "Ok"],
     }).then((willReset) => {
       if (willReset) {
         // Reset form fields and errors
