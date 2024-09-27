@@ -40,10 +40,12 @@ import {
 import TaskProgress, { saveTaskProgress, setStartStatus, updateTaskProgressStatusFromExecDetails } from "../data/localstorage/taskStatusStorage";
 import { getDateTime } from "../utils/dateTimeUtils";
 import { submitTaskStart } from "../data/offline/entity/DataTransfer";
+import { useTranslation } from "react-i18next";
 
 const isProd: any = import.meta.env.PROD;
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
   const { taskId } = useParams<{ taskId: string }>();
   const [ongoingTaskData, setOnGoingTaskData] = useState<any>([]);
   const [userData, setUserData] = useState<any>(null);
@@ -364,7 +366,7 @@ const Dashboard: React.FC = () => {
           </IonItem>
 
           <IonText className="welcomeText">
-            <h2>Welcome !</h2>
+            <h2>{t('welcome_text')}</h2>
             <h1> {userData?.first_name} {userData?.last_name}</h1>
             <h6>{userData?.role_name}</h6>
           </IonText>

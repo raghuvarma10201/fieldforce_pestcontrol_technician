@@ -26,8 +26,10 @@ import {toast} from "react-toastify";
 import NotificationLength from "../components/NotificationLength";
 // import {getTaskListByStatus} from '../data/offline/entity/DataRetriever';
 //  import {taskListFetcher} from "../data/offline/entity/DataRetriever";
+import { useTranslation } from 'react-i18next';
 
 const Home: React.FC = () => {
+  const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation<{ showAlert: boolean }>();
   const [showAlert, setShowAlert] = useState(false);
@@ -39,6 +41,9 @@ const Home: React.FC = () => {
   const [showSyncAlert, setShowSyncAlert] = useState(false);
   const app_version: any = localStorage.getItem('app_version');
   const app_name: any = localStorage.getItem('app_name');
+
+  const [languageData, setLanguageData] = useState<any>(null);
+  const [language, setLanguage] = useState(localStorage.getItem('language') || 'en'); // Default to English
 
   const isProd: any = import.meta.env.PROD;
   
@@ -59,6 +64,20 @@ const Home: React.FC = () => {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    loadLanguageData(language);
+  }, [language]);
+  // Function to load language data from the REST API
+  const loadLanguageData = async (lang: string) => {
+    try {
+      const response = await fetch(`https://rpwebapps.us/clients/fieldforce/resources/lang/${lang}.json`);
+      const data = await response.json();
+      console.log(data);
+      setLanguageData(data);
+    } catch (error) {
+      console.error('Error loading language data:', error);
+    }
+  };
   useEffect(() => {
     const fetchTasks = async () => {
       // await taskListFetcher();
@@ -190,7 +209,7 @@ const Home: React.FC = () => {
                           <div>
                           {userData && (
                             <IonText>
-                              <h5>Welcome!</h5>
+                              <h5>{t('welcome_text')}</h5>
                               <h1>
                                 {userData.first_name} {userData.last_name}
                               </h1>
@@ -209,7 +228,7 @@ const Home: React.FC = () => {
             <IonRow>
               <IonCol size="4">
                 <IonCard onClick={handleCheckIn}>
-                <IonText>Check In</IonText>
+                <IonText>{t('check_in')}</IonText>
                   <IonImg src="assets/images/checkin-icon.svg" />
                 
                 </IonCard>
@@ -234,7 +253,7 @@ const Home: React.FC = () => {
 
               <IonCol size="4">
                 <IonCard routerLink={"/LeaveRequestList"}>
-                <IonText>Apply Leave</IonText>
+                <IonText>{t('apply_leave')}</IonText>
                   <IonImg src="assets/images/apply-leave-icon.svg" />
                  
                 </IonCard>
@@ -243,7 +262,7 @@ const Home: React.FC = () => {
                 size="4"
               >
                 <IonCard className="ion-nomargin" routerLink={"/stocktransfer"}>
-                <IonText>Stock Transfer</IonText>
+                <IonText>{t('stock_transfer')}</IonText>
                   <IonImg src="assets/images/stock-transfer-home-icon.svg"></IonImg>
                  
                 </IonCard>
@@ -253,7 +272,7 @@ const Home: React.FC = () => {
                 size="4"
               >
                 <IonCard className="ion-nomargin logOutCard" onClick={handleLogout}>
-                <IonText>Logout</IonText>
+                <IonText>{t('logout')}</IonText>
                   <IonImg src="assets/images/logout-icon.svg"></IonImg>
                  
                 </IonCard>

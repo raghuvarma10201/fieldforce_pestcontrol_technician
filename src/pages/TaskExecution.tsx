@@ -793,6 +793,7 @@ const TaskExecution: React.FC = () => {
                     : "card"
               }
               onClick={() => {
+                
                 if (taskProgress?.recommGiven === -1 && isPaused) {
                   toast.info("Please resume the task to perform the action");
                 } else if (visitExecutionDetails?.pests_found?.length === 0) {

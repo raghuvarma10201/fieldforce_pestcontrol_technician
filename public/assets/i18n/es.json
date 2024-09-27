@@ -1,0 +1,31 @@
+{
+  "home": {
+    "welcome_text": "Bienvenido a nuestra aplicación",
+    "afternoon": [
+      "Good",
+      "Afternoon"
+    ],
+    "evening": [
+      "Good",
+      "Evening"
+    ]
+  },
+  "user": {
+    "actions": {
+      "login": [
+        "Please",
+        "login",
+        "to",
+        "your",
+        "account"
+      ],
+      "logout": [
+        "You",
+        "have",
+        "been",
+        "logged",
+        "out"
+      ]
+    }
+  }
+}

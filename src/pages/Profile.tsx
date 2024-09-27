@@ -11,6 +11,9 @@ import {
   IonButtons,
   IonTitle,
   IonFooter,
+  IonSelect,
+  IonSelectOption,
+  IonLabel,
 } from "@ionic/react";
 import { pencil, arrowBack } from "ionicons/icons";
 import { useHistory } from "react-router";
@@ -18,16 +21,20 @@ import AvatarImage from "../../public/assets/images/avatar_image.svg";
 import ChangePasswordForm from "../components/ChangePassword";
 import { useAuth } from "../components/AuthContext";
 import EnvironmentRibbon from "../components/EnvironmentRibbon";
+import i18n from "../i18n";
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 
 const isProd: any = import.meta.env.PROD;
 
 const Profile: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
-  const {logout} = useAuth();
+  const { logout } = useAuth();
   const [avatar, setAvatar] = useState<string>(AvatarImage);
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
   const app_version: any = localStorage.getItem('app_version');
   const app_name: any = localStorage.getItem('app_name');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(localStorage.getItem('language') || 'en');
+
 
   useEffect(() => {
     const userDataString = localStorage.getItem("userData");
@@ -67,30 +74,73 @@ const Profile: React.FC = () => {
   const handleLogout = async () => {
     const response = await logout();
     console.log("Logout Response", response);
-    if(response && response.data.status == 200 && response.data.success){
+    if (response && response.data.status == 200 && response.data.success) {
       history.push('/login');
     }
   };
+  const changeLanguage = (lng: any) => {
+    localStorage.setItem('language', lng);
+    setSelectedLanguage(lng);
+    //loadLanguageData(lng);
+    i18n.changeLanguage(lng);
 
+  };
+  // const cacheLanguageData = async (lang: string, data: string) => {
+  //   await Filesystem.writeFile({
+  //     path: `language_${lang}.json`,
+  //     data,
+  //     directory: Directory.Data,
+  //   });
+  // };
+
+  
+  // const base64ToJson = (base64String: any): object | null => {
+  //   try {
+  //     // Step 1: Fix URL-safe Base64 encoding (if needed)
+  //     base64String = base64String.replace(/-/g, '+').replace(/_/g, '/');
+  //     // Step 2: Add padding if necessary (length should be a multiple of 4)
+  //     while (base64String.length % 4 !== 0) {
+  //       base64String += '=';
+  //     }
+  //     // Step 3: Decode the Base64 string
+  //     const jsonString = atob(base64String);
+  //     // Step 4: Parse the decoded string into JSON
+  //     return JSON.parse(jsonString);
+  //   } catch (error) {
+  //     console.error('Error decoding Base64 string or parsing JSON:', error);
+  //     return null;
+  //   }
+  // };
+
+  // const loadLanguageData = async (lang: string) => {
+  //   try {
+  //     const response = await fetch(`https://rpwebapps.us/clients/fieldforce/resources/lang/${lang}.json`, { mode: 'no-cors' });
+  //     const data = await response.json();
+  //     console.log(data);
+  //     cacheLanguageData(lang, btoa(JSON.stringify(data)));
+  //   } catch (error) {
+  //     console.error('Error loading language data:', error);
+  //   }
+  // };
   return (
     <>
-    {!isProd && <EnvironmentRibbon position="ribbon top-right"/>}
-    <IonHeader  className="ion-no-border ion-padding-horizontal">
-      <IonToolbar>
-        <IonButtons slot="start" className="ion-no-padding">
-        <IonButton fill="clear" onClick={goBack} slot="start">
-          <IonIcon slot="icon-only" icon={arrowBack} />          
-        </IonButton>
-        </IonButtons>
-        <IonTitle>Profile</IonTitle>
-      </IonToolbar>
+      {!isProd && <EnvironmentRibbon position="ribbon top-right" />}
+      <IonHeader className="ion-no-border ion-padding-horizontal">
+        <IonToolbar>
+          <IonButtons slot="start" className="ion-no-padding">
+            <IonButton fill="clear" onClick={goBack} slot="start">
+              <IonIcon slot="icon-only" icon={arrowBack} />
+            </IonButton>
+          </IonButtons>
+          <IonTitle>Profile</IonTitle>
+        </IonToolbar>
       </IonHeader>
 
 
 
 
       <IonContent fullscreen className="ionContentColor profileWrapp">
-      
+
         <div style={{ paddingBottom: "16px", textAlign: "center" }}>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <div
@@ -165,26 +215,49 @@ const Profile: React.FC = () => {
               </h6>
             </IonText>
           )}
-           {!showChangePasswordForm && (
+          <div style={{
+            borderRadius: "1px",
+            fontWeight: 600,
+            marginLeft: "40px",
+            marginRight: "40px",
+            marginTop: "40px",
+          }}>
+            <IonLabel className="ion-label">App Language</IonLabel>
+            <IonSelect
+              className="custom-form-control"
+              placeholder="Select Priority"
+              value={selectedLanguage}
+              onIonChange={(e) => {
+                const selectedValue = e.detail.value;
+                changeLanguage(selectedValue);
+              }}
+            >
+              <IonSelectOption value="en">English</IonSelectOption>
+              <IonSelectOption value="es">Spain</IonSelectOption>
+              <IonSelectOption value="ar">Arabic</IonSelectOption>
+            </IonSelect>
+          </div>
+
+          {!showChangePasswordForm && (
             <>
-          <IonButton
-            type="button"
-            style={{
-              borderRadius: "1px",
-              fontWeight: 600,
-              marginLeft: "40px",
-              marginRight: "40px",
-              marginTop: "40px",
-              marginBottom: showChangePasswordForm ? "0px" : "40px",
-            }}
-            color="primary"
-            fill="solid"
-            expand="block"
-            onClick={toggleChangePasswordForm}
-            disabled={showChangePasswordForm}
-          >
-            CHANGE PASSWORD
-            </IonButton>
+              <IonButton
+                type="button"
+                style={{
+                  borderRadius: "1px",
+                  fontWeight: 600,
+                  marginLeft: "40px",
+                  marginRight: "40px",
+                  marginTop: "40px",
+                  marginBottom: showChangePasswordForm ? "0px" : "40px",
+                }}
+                color="primary"
+                fill="solid"
+                expand="block"
+                onClick={toggleChangePasswordForm}
+                disabled={showChangePasswordForm}
+              >
+                CHANGE PASSWORD
+              </IonButton>
               <IonButton
                 type="button"
                 style={{
@@ -196,15 +269,15 @@ const Profile: React.FC = () => {
                   marginBottom: "40px",
                 }}
                 color="secondary"
-               
+
                 expand="block"
                 onClick={handleLogout}
               >
-              LOGOUT
-            </IonButton>
+                LOGOUT
+              </IonButton>
             </>
           )}
-            {showChangePasswordForm && (
+          {showChangePasswordForm && (
             <ChangePasswordForm onClose={handleCloseChangePasswordForm} />
           )}
         </div>

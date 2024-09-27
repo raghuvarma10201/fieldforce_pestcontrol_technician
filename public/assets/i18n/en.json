@@ -1,0 +1,10 @@
+{
+  "home": {
+    "welcome_text": "Welcome to Fieldforce",
+    "afternoon": ["Good", "Afternoon"],
+    "evening": ["Good", "Evening"]
+  },
+  "dashboard": {
+    "welcome_text": "Welcome to Fieldforce Dashboard"
+  }
+}

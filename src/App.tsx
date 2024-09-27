@@ -82,7 +82,10 @@ import NetworkStatus from "./components/NetworkStatus";
 import { AuthProvider } from "./components/AuthContext";
 import AuthGuard from "./components/AuthGuard";
 import EnvironmentRibbon from "./components/EnvironmentRibbon";
-
+import i18n from './i18n';
+import {  Directory, Encoding } from '@capacitor/filesystem';
+import { Plugins } from "@capacitor/core";
+const { Filesystem } = Plugins;
 const apiUrl: any = import.meta.env.VITE_API_URL;
 const isProd: any = import.meta.env.PROD;
 
@@ -140,6 +143,7 @@ const App: React.FC = () => {
       setError("Geolocation Error or user not logged in.");
     }
   };
+
   async function handlePlatform() {
     try {
       const info = await Device.getInfo();
@@ -166,6 +170,11 @@ const App: React.FC = () => {
   }
   useEffect(() => {
     localStorage.setItem('app_name', 'pest_control');
+    Device.getLanguageCode().then((lang) => {
+      const languageCode = localStorage.getItem('language') || 'en'; // Extract language code from locale
+      i18n.changeLanguage(languageCode);
+    });
+    //loadLanguageData(language);
     handlePlatform();
     registerPushHandlers();
     console.log("Checking User session");
@@ -184,7 +193,6 @@ const App: React.FC = () => {
       console.log("User session NOT valid. DO NOT POLL Location.");
     }
   }, []);
-
   return (
     <IonApp>
       <NetworkStatus/>
