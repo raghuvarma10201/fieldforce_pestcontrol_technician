@@ -65,6 +65,7 @@ const TaskDetails: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
+    
     console.log('ddd');
     loadTaskFromParams();
     fetchTDetails(taskId);
@@ -78,6 +79,7 @@ const TaskDetails: React.FC = () => {
 
     try {
       const response = await retrieveNetworkTasksDetails(taskId);
+      console.log(response);
       if (response) {
         console.log("Fetched task details:", response);
         const taskData = response;
@@ -161,8 +163,8 @@ const TaskDetails: React.FC = () => {
       key: "7",
       icon: "treatment-type-icon.svg",
       labelTxt: "Treatment Type",
-      valueTxt: taskDetails.treatment_types
-        ? taskDetails.treatment_types
+      valueTxt: taskDetails.treatment_type
+        ? taskDetails.treatment_type
             .map((type: any) => type.treatment)
             .join(", ")
         : "Not available",

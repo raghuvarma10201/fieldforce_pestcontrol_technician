@@ -40,6 +40,7 @@ import {
   customerType,
   getAreas,
   addCustomer,
+  getBusinessId,
 } from "../data/apidata/taskApi/taskDataApi";
 import { toast, ToastContainer } from "react-toastify";
 import AddressSearch from "../components/AddressSearch";
@@ -394,6 +395,7 @@ const CreateTask: React.FC = () => {
         pests_reported: Object.keys(formData.selectedPests).join(","),
         customer_id: formData.customerId,
         location_id: formData.customerLocId,
+        business_id : await getBusinessId()
       },
     ];
 
@@ -917,7 +919,7 @@ const CreateTask: React.FC = () => {
                         checked={!!formData.selectedPests[data.id]}
                         onIonChange={handlePestsChange}
                       >
-                        {data.pest_report_type}
+                        {data.service_report_type}
                       </IonCheckbox>
                     </IonItem>
                   </IonList>

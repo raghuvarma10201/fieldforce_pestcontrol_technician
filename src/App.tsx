@@ -75,7 +75,7 @@ import StockTransferredReceived from "./pages/StockTransferredReceived";
 import StockTransferredDetails from "./pages/StockTransferDetails";
 import PestActivityFoundPreview from "../src/pages/PestActivityFoundPreview";
 import ChemicalUsedPreview from "../src/pages/ChemicalUsedPreview";
-import { App as Appp } from '@capacitor/app';
+import { App as CapacitorApp } from '@capacitor/app';
 import { Device } from "@capacitor/device";
 import NetworkSpeedCheck from "./components/NetworkSpeedCheck";
 import NetworkStatus from "./components/NetworkStatus";
@@ -83,8 +83,10 @@ import { AuthProvider } from "./components/AuthContext";
 import AuthGuard from "./components/AuthGuard";
 import EnvironmentRibbon from "./components/EnvironmentRibbon";
 import i18n from './i18n';
-import {  Directory, Encoding } from '@capacitor/filesystem';
+import { Directory, Encoding } from '@capacitor/filesystem';
 import { Plugins } from "@capacitor/core";
+import { appSettings, getLanguageFile } from "./data/apidata/commonApi";
+import AppUpdate from "./components/AppUpdate";
 const { Filesystem } = Plugins;
 const apiUrl: any = import.meta.env.VITE_API_URL;
 const isProd: any = import.meta.env.PROD;
@@ -146,12 +148,23 @@ const App: React.FC = () => {
 
   async function handlePlatform() {
     try {
+      const payload = { "type": "SETTINGS" }
+      const AppSettings = await appSettings(payload);
+      console.log(AppSettings);
+      if (AppSettings && AppSettings.data.success) {
+        const GoogleKey = AppSettings.data.data.find((setting: any) => setting.title === "Google_Map_API_Key");
+        console.log(GoogleKey);
+        if (GoogleKey) {
+          localStorage.setItem('Google_Map_API_Key', GoogleKey.description);
+
+        }
+      }
       const info = await Device.getInfo();
       const platform = info.platform;
       console.log(platform);
       if (platform === 'ios' || platform === 'android') {
         console.log('Running on Device');
-        const appInfos = await Appp.getInfo();
+        const appInfos = await CapacitorApp.getInfo();
         setAppInfo(appInfos);
         setAppVersion(appInfos.version);
 
@@ -170,10 +183,24 @@ const App: React.FC = () => {
   }
   useEffect(() => {
     localStorage.setItem('app_name', 'pest_control');
-    Device.getLanguageCode().then((lang) => {
+    Device.getLanguageCode().then(async (lang) => {
       const languageCode = localStorage.getItem('language') || 'en'; // Extract language code from locale
       i18n.changeLanguage(languageCode);
+      const translations = await fetchTranslations(languageCode);
+      i18n.addResourceBundle(languageCode, 'translation', translations);
     });
+    const fetchTranslations = async (lang: any) => {
+      try {
+        const response = await getLanguageFile(lang);
+        console.log(response);
+        if (!response) throw new Error('Network response was not ok');
+        const translations = response.data;
+        return translations;
+      } catch (error) {
+        console.error('Error fetching translations:', error);
+        return {};
+      }
+    };
     //loadLanguageData(language);
     handlePlatform();
     registerPushHandlers();
@@ -195,11 +222,12 @@ const App: React.FC = () => {
   }, []);
   return (
     <IonApp>
-      <NetworkStatus/>
+      <NetworkStatus />
       <ToastContainer />
       <AuthProvider>
+      <AppUpdate/>
         <IonReactRouter>
-        <NetworkSpeedCheck/>
+          <NetworkSpeedCheck />
           <IonRouterOutlet>
             <Switch>
               <Route exact path="/">
@@ -240,7 +268,7 @@ const App: React.FC = () => {
               <AuthGuard path="/stocktransfer" component={StockTransfer} />
               <AuthGuard path="/forms" component={Forms} />
               <AuthGuard path="/changePassword" component={ChangePasswordForm} />
-              
+
             </Switch>
           </IonRouterOutlet>
         </IonReactRouter>

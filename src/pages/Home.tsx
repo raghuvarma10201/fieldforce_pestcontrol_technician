@@ -64,20 +64,8 @@ const Home: React.FC = () => {
     }
   }, [location.state]);
 
-  useEffect(() => {
-    loadLanguageData(language);
-  }, [language]);
   // Function to load language data from the REST API
-  const loadLanguageData = async (lang: string) => {
-    try {
-      const response = await fetch(`https://rpwebapps.us/clients/fieldforce/resources/lang/${lang}.json`);
-      const data = await response.json();
-      console.log(data);
-      setLanguageData(data);
-    } catch (error) {
-      console.error('Error loading language data:', error);
-    }
-  };
+
   useEffect(() => {
     const fetchTasks = async () => {
       // await taskListFetcher();

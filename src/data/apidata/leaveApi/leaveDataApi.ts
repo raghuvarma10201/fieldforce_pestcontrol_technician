@@ -1,5 +1,5 @@
 import axiosInstance from "../../../components/ApiInterceptor";
-import { API_BASE_URL } from "../../baseUrl";
+import { getBusinessId } from "../taskApi/taskDataApi";
 interface LeaveData {
   available_leaves: string;
 }
@@ -24,7 +24,10 @@ export const fetchLeaveDetails = async () => {
 /////////////////// Fetch Leaves Types//////////////
 export const fetchLeaveTypes = async () => {
   try {
-    const response = await axiosInstance.get(`${apiUrl}/get-leave-types`);
+    const payload = {
+      business_id : await getBusinessId()
+    }
+    const response = await axiosInstance.post(`${apiUrl}/get-leave-types`,payload, {timeout: 1000});
     console.log(response);
     return response.data;
   }

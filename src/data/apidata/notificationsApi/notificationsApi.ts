@@ -1,5 +1,5 @@
 import axiosInstance from "../../../components/ApiInterceptor";
-import { API_BASE_URL } from "../../baseUrl";
+import { getBusinessId } from "../taskApi/taskDataApi";
 
 const apiUrl: any = import.meta.env.VITE_API_URL;
 
@@ -19,6 +19,7 @@ export const fetchNotifications = async () => {
       },
       filters: {
         "tbl_push_notifications.status": "28",
+        "tbl_push_notifications.business_id" : await getBusinessId()
       },
       pagination: {
         limit: "10",

@@ -10,6 +10,7 @@ import {
   taskInit,
   fetchQuestionnaire,
   fetchFilteredTaskData,
+  getBusinessId,
 } from "../../apidata/taskApi/taskDataApi";
 import {
   fetchTaskDetails,
@@ -17,6 +18,7 @@ import {
 } from "../../apidata/taskApi/taskDataApi";
 import { fetchIdealTechnicians, submitTechnicianData } from "../../apidata/technicianData/idealTechnicianData";
 import { anyUpSyncPending } from "./DataTransfer";
+import { business } from "ionicons/icons";
 //import { API_BASE_URL } from "../../baseUrl";
 let storage = new Storage();
 
@@ -82,6 +84,7 @@ export const retrieveNetworkTasks = async (
   lat: number,
   long: number
 ) => {
+
   console.log("retrieveNetworkTasks : Start ");
   // GET NW STATUS
   let nwStatus = await Network.getStatus();
@@ -108,7 +111,9 @@ export const retrieveNetworkFilteredTasks = async (
   // GET NW STATUS
   let nwStatus = await Network.getStatus();
   console.log("NETWORK OVERALL STATUS = ", nwStatus);
+  filterCriteria['tbl_visits.business_id'] = await getBusinessId();
 
+  console.log("filterCriteria==========================="+filterCriteria);
   //INIT DB Conn
   await storage.create();
   let consolidatedData: Array<any> = [];
@@ -117,6 +122,7 @@ export const retrieveNetworkFilteredTasks = async (
     console.log("Retrieve Network Filtered Tasks : NW ONLINE ");
 
     if (filterCriteria.priority !== "" && filterCriteria.service_date !== "") {
+      
       await fetchFilteredTaskData(filterCriteria, lat, long).then((response) => {
         console.log(response);
         if (response && response.success) {
@@ -151,8 +157,8 @@ const fetchTDetails = async (taskId: any) => {
     console.log("Task Details Response: ", response);
 
     if (response && response.success) {
-      console.log("response data", response.data[0]);
-      return response.data[0];
+      console.log("response data", response.data);
+      return response.data;
     } else {
       console.error("Failed to fetch task details. Error:", response.message);
       return null;
@@ -767,14 +773,15 @@ export const retriveChemicalUsedBasedOnNetwork = async () => {
 
 /////////////////////////////////////////
 // Function to fetchrecommendations data from local storage
-const fetchRecommendationsFromServer = async () => {
+const fetchRecommendationsFromServer = async (requestBody : any) => {
   const userData = getUserData();
   try {
     const response = await fetch(
       `${API_BASE_URL}/get-recommendations-list
 `,
       {
-        method: "GET",
+        method: "POST",
+        body: JSON.stringify(requestBody),
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userData?.api_token}`,
@@ -811,14 +818,18 @@ const retrieveRecommendationsFromStorage = async () => {
 };
 
 
-export const retrieveRecommendationsBasedOnNetwork = async () => {
+export const retrieveRecommendationsBasedOnNetwork = async (service_id : any) => {
   try {
     const nwStatus = await Network.getStatus();
     console.log('NETWORK OVERALL STATUS =', nwStatus);
     let anyOtxPending = await anyUpSyncPending();
     if (nwStatus.connected) {
       console.log('multiRecommendations: NW ONLINE');
-      return fetchRecommendationsFromServer();
+      const requestBody = {
+        service_id : service_id,//service_id,
+        business_id : await getBusinessId()
+      };
+      return fetchRecommendationsFromServer(requestBody);
     } else {
       console.log('multiRecommendations: NW OFFLINE');
       return retrieveRecommendationsFromStorage();

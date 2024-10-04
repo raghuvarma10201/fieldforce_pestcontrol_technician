@@ -8,17 +8,13 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next) // Pass i18n down to react-i18next
   .init({
-    lng: 'es', // Default language
-    fallbackLng: 'en', // Fallback language
-    backend: {
-      // URL to load translations
-      loadPath: 'https://cors-anywhere.herokuapp.com/https://rpwebapps.us/clients/fieldforce/resources/lang/{{lng}}.json',
-    },
+    lng: 'en', // default language
+    fallbackLng: 'en',
+    debug: true,
+    resources: {}, // Empty initially, we will load it dynamically
     interpolation: {
-      escapeValue: false, // React already does escaping
+      escapeValue: false, // react already safes from xss
     },
-    debug: true, // Enable debug mode for more detailed logging
   });
 
 export default i18n;
-

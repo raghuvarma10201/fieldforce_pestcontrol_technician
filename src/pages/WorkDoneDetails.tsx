@@ -354,7 +354,7 @@ const WorkDoneDetails: React.FC = () => {
 
                     {/* Handle Selection (Single) */}
                     {item.questions.type.toLowerCase() === "selection" ||
-                      ("Mcq" && item.questions.selection_type === "single" && (
+                      (item.questions.type.toLowerCase() === "Mcq" && item.questions.selection_type === "single" && (
                         <>
                           <Controller
                             name={`questions[${index}].answer`}

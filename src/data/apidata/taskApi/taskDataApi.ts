@@ -22,6 +22,14 @@ export const getUserData = () => {
   }
   return JSON.parse(userDataString);
 };
+export const getBusinessId = () => {
+  const userDataString = localStorage.getItem("userData");
+  if (!userDataString) {
+    console.error("User data is not available");
+    throw new Error("User Data Not available");
+  }
+  return (JSON.parse(userDataString)).business_id;
+};
 export const getActTaskData = () => {
   const userDataString = localStorage.getItem("activeTaskData");
   if (!userDataString) {
@@ -58,6 +66,7 @@ export const fetchTaskData = async (status: string[],latitude: number,longitude:
       },
       filters: {
         "tbl_visits.service_status": status,
+        "tbl_visits.business_id": await getBusinessId()
       },
       pagination: {
         limit: "0",
@@ -78,6 +87,7 @@ export const fetchTaskData = async (status: string[],latitude: number,longitude:
 };
 export const fetchFilteredTaskData = async (filterCriteria: string[],latitude: number,longitude: number) => {
   try {
+    
     const requestBody = {
       columns: [
         "tbl_visits.id",
@@ -242,6 +252,7 @@ export const fetchTaskDetails = async (id: string) => {
       filters: {
         // "tbl_visits.service_status": "14",
         "tbl_visits.id": id,
+        "tbl_visits.business_id" : await getBusinessId()
       },
       pagination: {
         limit: "1",
@@ -486,8 +497,9 @@ export const pestReported = async (serviceId: any) => {
   try {
     const requestBody = {
       service_id: serviceId,
+      business_id : await getBusinessId()
     };
-    const response = await axiosInstance.post(`${apiUrl}/get-pests-reported`, requestBody);
+    const response = await axiosInstance.post(`${apiUrl}/get-services-reported`, requestBody);
     console.log(response);
     return response.data;
   }
@@ -499,7 +511,10 @@ export const pestReported = async (serviceId: any) => {
 
 export const customerList = async () => {
   try {
-    const response = await axiosInstance.get(`${apiUrl}/get-customers`);
+    const payload = {
+      business_id : await getBusinessId()
+    }
+    const response = await axiosInstance.post(`${apiUrl}/get-customers`,payload);
     console.log(response);
     return response.data;
   }
@@ -512,6 +527,7 @@ export const customerLocations = async (customerId: any) => {
   try {
     const requestBody = {
       customer: customerId,
+      business_id : await getBusinessId()
     };
     const response = await axiosInstance.post(`${apiUrl}/get-customer-location`,requestBody);
     console.log(response);
@@ -524,7 +540,10 @@ export const customerLocations = async (customerId: any) => {
 
 export const serviceList = async () => {
   try {
-    const response = await axiosInstance.get(`${apiUrl}/get-services`);
+    const payload = {
+      business_id : await getBusinessId()
+    }
+    const response = await axiosInstance.post(`${apiUrl}/get-services`,payload);
     console.log(response);
     return response.data;
   }
@@ -535,7 +554,10 @@ export const serviceList = async () => {
 
 export const timeDuration = async () => {
   try {
-    const response = await axiosInstance.get(`${apiUrl}/time-duration`);
+    const payload = {
+      business_id : await getBusinessId()
+    }
+    const response = await axiosInstance.post(`${apiUrl}/time-duration`,payload);
     console.log(response);
     return response.data;
   }
@@ -579,6 +601,7 @@ export const addCustomer = async (requestBody: any) => {
 ///////////////////////recommendations Apis//////////////////////////////////
 
 export const multiRecommendations = async () => {
+  alert();
   try {
     const response = await axiosInstance.get(`${apiUrl}/get-recommendations-list`);
     console.log(response);

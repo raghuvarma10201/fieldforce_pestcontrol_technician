@@ -9,6 +9,7 @@ import {
   taskInit,
   submitRecommendations,
   submitWorkDoneDetail,
+  getBusinessId,
 } from "../../apidata/taskApi/taskDataApi";
 import { getCurrentLocation } from "../../providers/GeoLocationProvider";
 import { Network } from "@capacitor/network";
@@ -808,6 +809,7 @@ export const saveChemicalUseddataToApi = async (
 ) => {
   const requestBody = [
     {
+      business_id : await getBusinessId(),
       visit_id: visit_id,
       latitude: latitude,
       longitude: longitude,
@@ -1100,16 +1102,16 @@ export const saveRecommendationsDataToApi = async (
   visit_id: string,
   recommDataArray: any // Ensure recommDataArray matches the structure you're expecting
 ) => {
-  const requestBody = recommDataArray.map((recommItem: any) => ({
+  const requestBody = {
     visit_id: visit_id,
     latitude: latitude,
     longitude: longitude,
-    recommendations: recommItem.recommendations || [],
-    is_recommendation_added: recommItem.is_recommendation_added || "",
-    pest_reported_id: recommItem.pest_reported_id || 0,
-    is_service_available: recommItem.is_service_available || "",
-    recommended_media: recommItem.recommended_media || [],
-  }));
+    recommendations: recommDataArray.recommendations || [],
+    is_recommendation_added: recommDataArray.is_recommendation_added || "",
+    pest_reported_id: recommDataArray.pest_reported_id || 0,
+    is_service_available: recommDataArray.is_service_available || "",
+    recommended_media: recommDataArray.recommended_media || [],
+  };
 
   try {
     const responseData = await submitRecommendations(requestBody);

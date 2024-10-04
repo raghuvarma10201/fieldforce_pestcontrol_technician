@@ -5,6 +5,8 @@ const config: CapacitorConfig = {
   appName: 'Fieldforce Technician App',
   webDir: 'dist',
   server: {
+    cleartext: true,
+    hostname: 'https://rpwebapps.us/',
     androidScheme: 'https',
   },
   plugins: {

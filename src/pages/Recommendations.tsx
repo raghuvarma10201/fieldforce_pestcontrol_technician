@@ -72,7 +72,9 @@ interface RecommendationData {
   recommendation_id?: string;
   description?: string;
   is_service_available?: string;
-  selectedRecommendations?: { recommendation_type_id: string; id: string }[];
+  selectedRecommendations?: { recommendation_type_id: string; id: string, dependency_label_text: string, descriptive: string, }[];
+  selectedRecommendationDescriptions?: { recommendation_type_id: string; description: string }[];
+  selectedRecommendationFiles?: { recommendation_type_id: string; file: any }[];
   recommended_media?: any[];
   custom_recommendation?: string;
   recommendations?: any; // Add recommendations property
@@ -84,15 +86,17 @@ interface RecommendationData {
 
 // Define the type for a grouped recommendation
 interface GroupedRecommendation {
-  recommendation_type_id: string;
-  recommendation_id: string;
-  description: string;
+  question_id: string;
+  option_id: string;
+  dependency_label_text: string;
+  descriptive: string;
 }
 
 interface SelectedRecommendation {
-  recommendation_type_id: string;
-  id: string;
-  description?: string;
+  question_id: string;
+  option_id: string;
+  dependency_label_text: string;
+  descriptive: string;
 }
 
 const Recommendations = () => {
@@ -146,7 +150,7 @@ const Recommendations = () => {
     is_service_available: "",
     recommendations: "",
   });
-
+  console.log(activeTaskData);
   // Move the pest activity processing logic into a useEffect that depends on visitExecutionDetails
   useEffect(() => {
     if (visitExecutionDetails) {
@@ -224,6 +228,9 @@ const Recommendations = () => {
         recommended_media: [],
         recommendations: [],
         selectedRecommendations: [],
+        selectedRecommendationDescriptions: [],
+        selectedRecommendationFiles: [],
+
       };
     });
 
@@ -240,7 +247,7 @@ const Recommendations = () => {
     initTaskExecForm();
   }, []);
   useEffect(() => {
-    retrieveRecommendationsBasedOnNetwork()
+    retrieveRecommendationsBasedOnNetwork(activeTaskData.service_id)
       .then((response) => {
         if (response && response.success) {
           const data = response.data;
@@ -259,10 +266,10 @@ const Recommendations = () => {
       });
   }, []);
 
-  const validateInputs = () => {
+  const validateInputs = (recommendation : any) => {
     let isValid = true;
 
-    console.log("Current recommendation data array:", recommDataArray);
+    console.log("Submitted recommendation data array:", recommendation);
 
     recommDataArray.forEach((recommItem, index) => {
       if (!recommItem.is_recommendation_added) {
@@ -280,63 +287,19 @@ const Recommendations = () => {
           recommendationTypes
         );
 
-        const uniqueRecommendationTypes = Array.from(
-          new Set(
-            recommendationTypes.map((type) => type.recommendation_type_id)
-          )
-        );
-
-        if (
-          !Array.isArray(uniqueRecommendationTypes) ||
-          uniqueRecommendationTypes.length !== recomm.length
-        ) {
-          isValid = false;
-          console.log(
-            "Recommendation types are not defined or empty for index:",
-            index
-          );
-        } else {
-          const allTypesValid = uniqueRecommendationTypes.every((typeId) => {
-            const selected = recomm.filter(
-              (rec) => rec.recommendation_type_id === typeId
-            );
-            console.log(`Checking type ${typeId}:`, selected);
-            return selected.length > 0; // Ensure at least one selection exists for each type
-          });
-
-          if (!allTypesValid) {
-            isValid = false;
-            console.log(
-              `At least one recommendation must be selected for recommendation type at index ${index}`
-            );
-          }
-
-          // Check for description if 'Others' is selected
-          uniqueRecommendationTypes.forEach((typeId) => {
-            const othersSelected = recommendationTypes.some(
-              (rec) =>
-                rec.recommendation_type_id === typeId && rec.id === "Others"
-            );
-            console.log(
-              `'Others' selected for type ${typeId} at index ${index}:`,
-              othersSelected
-            );
-
-            if (othersSelected) {
-              const description = customDescriptions[index]?.[typeId] || "";
-              console.log(
-                `Description for 'Others' selection at index ${index} and type ${typeId}:`,
-                description
-              );
-              if (!description) {
-                isValid = false;
-                console.log(
-                  `Description is required for 'Others' selection at index ${index} and type ${typeId}`
-                );
-              }
+        recomm.forEach((type: any) => {
+          const isFilled = recommendation.recommendations.find((rec : any) => rec.question_id == type.questions.id);
+          console.log(isFilled);
+          if(isFilled){
+            if((type.questions.type === 'descriptive' || type.questions.type === 'file') && isFilled.descriptive === ''){
+              isValid = false;
+              return isValid;
             }
-          });
-        }
+          }else{
+            isValid = false;
+            return isValid;
+          }
+        })
       }
 
       if (!recommItem.is_service_available) {
@@ -356,8 +319,43 @@ const Recommendations = () => {
     console.log("Validation result:", isValid);
     return isValid;
   };
+  const groupMcqRecommendations = (
+    selectedRecommendations: any[]): any[] => {
+    const grouped: any[] = [];
+    const uniqueDescriptions: { [key: string]: Set<string> } = {};
 
+    selectedRecommendations.forEach(({ question_id, option_id, dependency_label_text,descriptive}) => {
+      const existingItem = grouped.find(
+        (item) => item.question_id === question_id
+      );
+
+      if (existingItem) {
+        //existingItem.recommendation_id += `,${id}`;
+        if (option_id) {
+          if (!uniqueDescriptions[question_id]) {
+            uniqueDescriptions[question_id] = new Set();
+          }
+          if (!uniqueDescriptions[question_id].has(option_id)) {
+            uniqueDescriptions[question_id].add(option_id);
+            existingItem.option_id += `, ${option_id}`;
+          }
+        }
+      } else {
+        grouped.push({
+          question_id : question_id,
+          option_id :  option_id,
+          dependency_label_text: '',
+          descriptive: '',
+        });
+      }
+    });
+    console.log(grouped);
+    return grouped;
+  };
   const onSubmit = async (data: any) => {
+    console.log(recommDataArray);
+    const requestBody: { visit_id: any; is_recommendation_added: any; pest_reported_id: any; is_service_available: any; recommendations: { question_id: any; option_id: any; dependency_label_text: any; descriptive: any; }[]; recommended_media: any; latitude: string | number; longitude: string | number; }[] = [];
+    //const ccc = recommDataArray[0].selectedRecommendations.some((selected: any) =>selected.recommendation_type_id === type.questions.id))
     console.log("Submit data : ", data);
     console.log("recommDataArray ==== ", recommDataArray);
     setFormSubmitted(true);
@@ -372,17 +370,76 @@ const Recommendations = () => {
     const visit_id = activeTaskData?.id ?? "";
     console.log("visit id from session storage ", visit_id);
     setIsSubmitting(true);
+    
+    recommDataArray.forEach((recommItem: any, index: any) => {
+      let mcqData = recommItem.selectedRecommendations?.map((question: any) => {
+        const questionId = question.recommendation_type_id;
+        const answerId = Array.isArray(question.id) ? question.id.join(",") : question.id || "";
+        const dependencyLabelText = question.dependencyLabelText || "";
+        const descriptive = Array.isArray(question.descriptive) ? question.descriptive.join(",") : question.descriptive || "";
+        return {
+          question_id: questionId,
+          option_id: answerId,
+          dependency_label_text: dependencyLabelText,
+          descriptive: descriptive,
+        };
+      });
+      mcqData = groupMcqRecommendations(mcqData);
+      const descriptiveData = recommItem.selectedRecommendationDescriptions?.map((question: any) => {
+        const questionId = question.recommendation_type_id;
+        const answerId = '';
+        const dependencyLabelText = "";
+        const descriptive = question.description;
+        return {
+          question_id: questionId,
+          option_id: answerId,
+          dependency_label_text: dependencyLabelText,
+          descriptive: descriptive,
+        };
+      });
+      const fileData = recommItem.selectedRecommendationFiles?.map((question: any) => {
+        const questionId = question.recommendation_type_id;
+        const answerId = '';
+        const dependencyLabelText = "";
+        const descriptive = question.file;
+        return {
+          question_id: questionId,
+          option_id: answerId,
+          dependency_label_text: dependencyLabelText,
+          descriptive: descriptive,
+        };
+      });
+      console.log(mcqData);
+      console.log(descriptiveData);
+      console.log(fileData);
+      const mergedArray = [...new Set([...(mcqData ?? []), ...(descriptiveData ?? []), ...(fileData ?? [])])];
+      console.log(mergedArray);
 
+      const search = {
+        visit_id: visit_id,
+        is_recommendation_added: recommItem.is_recommendation_added || "",
+        pest_reported_id: recommItem.pest_reported_id,
+        is_service_available: recommItem.is_service_available || "",
+        recommendations: mergedArray,
+        recommended_media: recommItem.recommended_media || [],
+        latitude: location?.latitude || "",
+        longitude: location?.longitude || "",
+      }
+      requestBody.push(search);
+    });
+    console.log(requestBody);
+    //await validateInputs(requestBody[0]);
+    
     try {
       // Validate inputs
-      if (!validateInputs()) {
+      if (!validateInputs(requestBody[0])) {
         console.error(
           "Validation failed. Please fill in all the required fields."
         );
         setSubmitting(false); // Stop form submission
+        toast.error("Please fill all fields")
         return;
       }
-
       // Validate each pest entry
       const isValid = recommDataArray.every(validatePestData);
       if (!isValid) {
@@ -393,21 +450,6 @@ const Recommendations = () => {
       }
 
       setSubmitting(true);
-
-      const requestBody = recommDataArray.map((recommItem, index) => ({
-        visit_id: visit_id,
-        is_recommendation_added: recommItem.is_recommendation_added || "",
-        pest_reported_id: recommItem.pest_reported_id,
-        is_service_available: recommItem.is_service_available || "",
-        recommendations: groupRecommendations(
-          recommItem.selectedRecommendations || [],
-          index
-        ),
-        recommended_media: recommItem.recommended_media || [],
-        latitude: location?.latitude || "",
-        longitude: location?.longitude || "",
-      }));
-
       console.log(JSON.stringify(requestBody, null, 2));
       console.log("Request Body: ", requestBody);
 
@@ -415,7 +457,7 @@ const Recommendations = () => {
         location?.latitude?.toString() || "", // Pass latitude as a string
         location?.longitude?.toString() || "", // Pass longitude as a string
         visit_id,
-        requestBody
+        requestBody[0]
       );
 
       // Check the structure of responseData.data
@@ -502,26 +544,43 @@ const Recommendations = () => {
     selectedIds: string[],
     recommendation_type_id: string
   ) => {
+
     // Use "OthersID" for the Others selection
     const othersId = "Others";
-
+    console.log(selectedIds);
     // Map selectedIds to the appropriate recommendation objects
-    const selectedRecommendations = selectedIds.map((id) => {
-      if (id === othersId) {
+    let selectedRecommendations;
+    if (typeof selectedIds === 'string') {
+      const recommendation = recomm.flatMap((type) => type.answers).find((rec) => rec.id === selectedIds);
+      selectedRecommendations = [{
+        recommendation_type_id: recommendation_type_id,
+        id: selectedIds,
+        dependency_label_text: '',
+        descriptive: recommendation.options,
+      }]
+    } else {
+      selectedRecommendations = selectedIds.map((id) => {
+        if (id === othersId) {
+          return {
+            recommendation_type_id,
+            id: othersId, // Use "OthersID" here
+            dependency_label_text: '',
+            descriptive: '',
+          };
+        }
+        console.log(recomm);
+        const recommendation = recomm.flatMap((type) => type.answers).find((rec) => rec.id === id);
+        console.log(recommendation);
         return {
-          recommendation_type_id,
-          id: othersId, // Use "OthersID" here
+          recommendation_type_id:
+            recommendation?.recommendation_type_id || recommendation_type_id,
+          id,
+          dependency_label_text: '',
+          descriptive: recommendation.options,
         };
-      }
-      const recommendation = recomm
-        .flatMap((type) => type.recommendations)
-        .find((rec) => rec.id === id);
-      return {
-        recommendation_type_id:
-          recommendation?.recommendation_type_id || recommendation_type_id,
-        id,
-      };
-    });
+      });
+    }
+
 
     setRecommDataArray((prevState) => {
       const newState = [...prevState];
@@ -552,7 +611,52 @@ const Recommendations = () => {
       return updatedOthersSelections;
     });
   };
+  const isRecommIdChanged2 = (
+    index: number,
+    description: string,
+    recommendation_type_id: string
+  ) => {
+    // Use "OthersID" for the Others selection
+    const othersId = "Others";
 
+    // Map selectedIds to the appropriate recommendation objects
+    //const selectedDescription = description;
+
+    const selectedDescription = [{
+      recommendation_type_id: recommendation_type_id,
+      description: description,
+    }]
+    setRecommDataArray((prevState) => {
+      const newState = [...prevState];
+      // Filter out existing recommendations of the same type to avoid duplicates
+      const filteredRecommendations = (
+        newState[index]?.selectedRecommendationDescriptions || []
+      ).filter((rec) => rec.recommendation_type_id !== recommendation_type_id);
+
+      console.log(filteredRecommendations);
+
+      newState[index] = {
+        ...newState[index],
+        selectedRecommendationDescriptions: [
+          ...filteredRecommendations,
+          ...selectedDescription,
+        ],
+      };
+      console.log(recommDataArray);
+      return newState;
+    });
+
+    // Update the state for "Others" selections
+    setOthersSelections((prev) => {
+      const updatedOthersSelections = { ...prev };
+      if (!updatedOthersSelections[index]) {
+        updatedOthersSelections[index] = {};
+      }
+      // updatedOthersSelections[index][recommendation_type_id] =
+      //   selectedIds.includes(othersId);
+      return updatedOthersSelections;
+    });
+  };
   const isServAvailChanged = (index: number, value: string) => {
     if (index >= 0 && index < recommDataArray.length) {
       const updatedRecommDataArray = [...recommDataArray];
@@ -604,6 +708,65 @@ const Recommendations = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleRecommImageUpload = async (
+    index: number,
+    recommendation_type_id: string,
+    source: number) => {
+    try {
+      let src;
+      if (source == 1) {
+        src = CameraSource.Camera;
+      } else if (source == 2) {
+        src = CameraSource.Photos;
+      } else if (source == 3) {
+        src = CameraSource.Prompt;
+      } else {
+        src = CameraSource.Prompt;
+      }
+      if (Capacitor.getPlatform() === "web") src = CameraSource.Photos;
+
+      const capturedImage = await Camera.getPhoto({
+        quality: 25,
+        allowEditing: false,
+        saveToGallery: false,
+        source: src,
+        //direction: CameraDirection.Rear,
+        resultType: CameraResultType.Base64,
+      });
+      const imageUrl = "data:image/jpeg;base64," + capturedImage.base64String;
+      console.log("Captured image", imageUrl);
+      setImageUploadForIndex(index, true);
+
+      const selectedFile = [{
+        recommendation_type_id: recommendation_type_id,
+        file: imageUrl,
+        dependency_label_text: '',
+        descriptive: '',
+      }]
+      setRecommDataArray((prevState) => {
+        const newState = [...prevState];
+        // Filter out existing recommendations of the same type to avoid duplicates
+        const filteredRecommendations = (
+          newState[index]?.selectedRecommendationFiles || []
+        ).filter((rec) => rec.recommendation_type_id !== recommendation_type_id);
+
+        console.log(filteredRecommendations);
+
+        newState[index] = {
+          ...newState[index],
+          selectedRecommendationFiles: [
+            ...filteredRecommendations,
+            ...selectedFile,
+          ],
+        };
+        console.log(recommDataArray);
+        return newState;
+      });
+
+    } catch (error) {
+      console.error("Error capturing image:", error);
+    }
+  };
   const handleImageUpload = async (sectionIndex: number) => {
     try {
       let src = CameraSource.Prompt;
@@ -685,46 +848,6 @@ const Recommendations = () => {
     }
   };
 
-  const groupRecommendations = (
-    selectedRecommendations: SelectedRecommendation[],
-    index: number
-  ): GroupedRecommendation[] => {
-    const grouped: GroupedRecommendation[] = [];
-    const uniqueDescriptions: { [key: string]: Set<string> } = {};
-
-    selectedRecommendations.forEach(({ recommendation_type_id, id }) => {
-      const description =
-        customDescriptions[index]?.[recommendation_type_id] || "";
-      const existingItem = grouped.find(
-        (item) => item.recommendation_type_id === recommendation_type_id
-      );
-
-      if (existingItem) {
-        existingItem.recommendation_id += `,${id}`;
-        if (description) {
-          if (!uniqueDescriptions[recommendation_type_id]) {
-            uniqueDescriptions[recommendation_type_id] = new Set();
-          }
-          if (!uniqueDescriptions[recommendation_type_id].has(description)) {
-            uniqueDescriptions[recommendation_type_id].add(description);
-            existingItem.description += `, ${description}`;
-          }
-        }
-      } else {
-        grouped.push({
-          recommendation_type_id,
-          recommendation_id: id,
-          description,
-        });
-        if (description) {
-          uniqueDescriptions[recommendation_type_id] = new Set([description]);
-        }
-      }
-    });
-
-    return grouped;
-  };
-
   const filteredPestActivityArray = Array.from(
     new Set(
       visitExecutionDetails?.pests_found?.map(
@@ -780,7 +903,7 @@ const Recommendations = () => {
                         </IonLabel>
                         <IonSelect
                           placeholder="Select"
-                          
+
                           style={{ width: "100%" }}
                           value={
                             recommDataArray[index]?.is_recommendation_added
@@ -812,119 +935,183 @@ const Recommendations = () => {
 
                     {recommDataArray[index]?.is_recommendation_added ===
                       "Yes" && (
-                      <>
-                        {recomm.map((type, mapIndex) => (
-                          <IonItem
-                            lines="none"
-                            key={type.recommendation_type_id}
-                          >
-                            <div className="width100">
-                              <IonLabel className="ion-label">
-                                {type.recommendation_type} Issue
-                                <IonText>*</IonText>
-                              </IonLabel>
-                              <IonSelect
-                                placeholder="Select"
-                                
-                                style={{ width: "100%" }}
-                                multiple={true}
-                                value={
-                                  recommDataArray[
-                                    index
-                                  ]?.selectedRecommendations
-                                    ?.filter(
-                                      (selected) =>
-                                        selected.recommendation_type_id ===
-                                        type.recommendation_type_id
-                                    )
-                                    .map((selected) => selected.id) || []
-                                }
-                                onIonChange={(e) => {
-                                  clearErrors(
-                                    `recommDataArray[${index}].recommendation_id`
-                                  );
-                                  const value = e.detail.value as string[];
-                                  isRecommIdChanged(
-                                    index,
-                                    value,
-                                    type.recommendation_type_id
-                                  );
-                                }}
-                              >
-                                {type.recommendations.map((rec: any) => (
-                                  <IonSelectOption key={rec.id} value={rec.id}>
-                                    {rec.recommendation}
-                                  </IonSelectOption>
-                                ))}
-                                <IonSelectOption value="Others">
-                                  Others
-                                </IonSelectOption>
-                              </IonSelect>
+                        <>
+                          {recomm.map((type, mapIndex) => (
+                            <IonItem
+                              lines="none"
+                              key={type.questions.id}
+                            >
+                              <div className="width100">
+                                <IonLabel className="ion-label">
+                                  {type.questions.question}
+                                  <IonText>*</IonText>
+                                </IonLabel>
+                                {type.questions.type === "descriptive" && (
+                                  <IonTextarea
+                                    aria-label="Reason"
 
-                              {formSubmitted &&
-                                (!recommDataArray[index]
-                                  ?.selectedRecommendations ||
-                                  !recommDataArray[
-                                    index
-                                  ].selectedRecommendations.some(
-                                    (selected: any) =>
-                                      selected.recommendation_type_id ===
-                                      type.recommendation_type_id
-                                  )) && (
-                                  <IonText color="danger">
-                                    Please select at least one recommendation
-                                    for {type.recommendation_type}.
-                                  </IonText>
+                                    placeholder={type.questions.question}
+                                    value={
+                                      recommDataArray[index]?.selectedRecommendationDescriptions
+                                        ?.filter(
+                                          (selected) =>
+                                            selected.recommendation_type_id === type.questions.id
+                                        )
+                                        .map((selected) => selected.description) // returns an array of descriptions
+                                        .join(', ') || ''  // Join them into a single string, separated by a comma (or use '\n' for new lines)
+                                    }
+                                    onIonInput={(e) => {
+                                      clearErrors(
+                                        `recommDataArray[${index}].recommendation_id`
+                                      );
+                                      const value = e.detail.value as string;
+                                      isRecommIdChanged2(
+                                        index,
+                                        value,
+                                        type.questions.id
+                                      );
+                                    }}
+                                  ></IonTextarea>
                                 )}
+                                {type.questions.type === "mcq" && (
+                                  <IonSelect
+                                    placeholder="Select"
 
-                              {othersSelections[index]?.[
-                                type.recommendation_type_id
-                              ] && (
-                                <IonItem lines="none">
-                                  <div className="width100">
-                                    <IonLabel className="ion-label">
-                                      Description<IonText>*</IonText>
-                                    </IonLabel>
-                                    <IonTextarea
-                                      aria-label="Reason"
-                                      
-                                      placeholder="Enter reason"
-                                      value={
-                                        customDescriptions[index]?.[
-                                          type.recommendation_type_id
-                                        ] || ""
+                                    style={{ width: "100%" }}
+                                    multiple={(() => {
+                                      if (type.questions.selection_type === 'single') {
+                                        return false;
+                                      } else {
+                                        return true;
                                       }
-                                      onIonInput={(e) => {
-                                        console.log(
-                                          `User is typing in description for index: ${index}, recommendationTypeId: ${type.recommendation_type_id}`
-                                        );
-                                        clearErrors(
-                                          `customDescriptions[${index}].${type.recommendation_type_id}`
-                                        );
-                                        handleReasonChange(
-                                          index,
-                                          type.recommendation_type_id,
-                                          e.detail.value || ""
-                                        );
-                                      }}
-                                    ></IonTextarea>
-                                    {formSubmitted &&
-                                      !customDescriptions[index]?.[
-                                        type.recommendation_type_id
-                                      ] && (
-                                        <IonText color="danger">
-                                          Description is required for 'Others'
-                                          selection.
-                                        </IonText>
-                                      )}
+                                    })()}
+                                    value={
+                                      recommDataArray[
+                                        index
+                                      ]?.selectedRecommendations
+                                        ?.filter(
+                                          (selected) =>
+                                            selected.recommendation_type_id === type.questions.id
+                                        )
+                                        .map((selected) => selected.id) || []
+                                    }
+                                    onIonChange={(e) => {
+                                      clearErrors(
+                                        `recommDataArray[${index}].recommendation_id`
+                                      );
+                                      console.log(e);
+                                      const value = e.detail.value as string[];
+
+                                      isRecommIdChanged(
+                                        index,
+                                        value,
+                                        type.questions.id
+                                      );
+                                    }}
+                                  >
+                                    {type.answers.map((rec: any) => (
+                                      <IonSelectOption key={rec.id} value={rec.id}>
+                                        {rec.options}
+                                      </IonSelectOption>
+                                    ))}
+                                    <IonSelectOption value="Others">
+                                      Others
+                                    </IonSelectOption>
+                                  </IonSelect>
+                                )}
+                                {type.questions.type === "file" && (
+                                  <div>
+                                    <IonButton
+                                      className="ion-button"
+                                      fill="solid"
+                                      color="medium"
+                                      onClick={() => handleRecommImageUpload(index, type.questions.id, type.questions.source)}>
+                                      {type.questions.source == 1 && ('Capture')}
+                                      {type.questions.source == 2 && ('Upload')}
+                                      {type.questions.source == 3 && ('Capture/Upload')}
+                                    </IonButton>
+                                    {recommDataArray[index]?.selectedRecommendationFiles &&
+                                              recommDataArray[index]?.selectedRecommendationFiles
+                                                ?.filter((selected) => selected.recommendation_type_id === type.questions.id)
+                                                .map((selected) => selected.file)[0] && (
+
+                                      <IonItem lines="none">
+                                        <div >
+                                          <img
+                                            className="width100"
+                                            src={recommDataArray[index]?.selectedRecommendationFiles &&
+                                              recommDataArray[index]?.selectedRecommendationFiles
+                                                ?.filter((selected) => selected.recommendation_type_id === type.questions.id)
+                                                .map((selected) => selected.file)[0] || ''  // Take the first image, or provide an empty string
+                                            }
+                                            alt="Recommendation Image"
+                                          />
+                                        </div>
+                                      </IonItem>
+                                    )}
                                   </div>
-                                </IonItem>
-                              )}
-                            </div>
-                          </IonItem>
-                        ))}
-                      </>
-                    )}
+
+                                )}
+                                {formSubmitted &&
+                                  ((!recommDataArray[index]?.selectedRecommendations || !recommDataArray[index].selectedRecommendations.some((selected: any) => selected.recommendation_type_id === type.questions.id)) &&
+
+                                    (!recommDataArray[index]?.selectedRecommendationDescriptions || !recommDataArray[index].selectedRecommendationDescriptions.some((selected: any) => selected.recommendation_type_id === type.questions.id)) &&
+
+                                    (!recommDataArray[index]?.selectedRecommendationFiles || !recommDataArray[index].selectedRecommendationFiles.some((selected: any) => selected.recommendation_type_id === type.questions.id))) && (
+
+                                    <IonText color="danger">
+                                      This field is required.
+                                    </IonText>
+                                  )}
+
+                                {othersSelections[index]?.[
+                                  type.recommendation_type_id
+                                ] && (
+                                    <IonItem lines="none">
+                                      <div className="width100">
+                                        <IonLabel className="ion-label">
+                                          Description<IonText>*</IonText>
+                                        </IonLabel>
+                                        <IonTextarea
+                                          aria-label="Reason"
+
+                                          placeholder="Enter reason"
+                                          value={
+                                            customDescriptions[index]?.[
+                                            type.recommendation_type_id
+                                            ] || ""
+                                          }
+                                          onIonInput={(e) => {
+                                            console.log(
+                                              `User is typing in description for index: ${index}, recommendationTypeId: ${type.recommendation_type_id}`
+                                            );
+                                            clearErrors(
+                                              `customDescriptions[${index}].${type.recommendation_type_id}`
+                                            );
+                                            handleReasonChange(
+                                              index,
+                                              type.recommendation_type_id,
+                                              e.detail.value || ""
+                                            );
+                                          }}
+                                        ></IonTextarea>
+                                        {formSubmitted &&
+                                          !customDescriptions[index]?.[
+                                          type.recommendation_type_id
+                                          ] && (
+                                            <IonText color="danger">
+                                              Description is required for 'Others'
+                                              selection.
+                                            </IonText>
+                                          )}
+                                      </div>
+                                    </IonItem>
+                                  )}
+                              </div>
+                            </IonItem>
+                          ))}
+                        </>
+                      )}
 
                     <IonItem lines="none">
                       <div className="width100">
@@ -933,7 +1120,7 @@ const Recommendations = () => {
                         </IonLabel>
                         <IonSelect
                           placeholder="Select"
-                          
+
                           style={{ width: "100%" }}
                           value={recommDataArray[index]?.is_service_available}
                           onIonChange={(e) => {
@@ -1033,7 +1220,7 @@ const Recommendations = () => {
               <IonToolbar className="ionFooterTwoButtons">
                 <IonButton
                   className="ion-button"
-                  
+
                   color="medium"
                   onClick={handleCancel}
                 >
@@ -1043,7 +1230,7 @@ const Recommendations = () => {
                   className="ion-button"
                   color="primary"
                   type="submit"
-                  // disabled={isSubmitting || !validateInputs()}
+                // disabled={isSubmitting || !validateInputs()}
                 >
                   SUBMIT
                 </IonButton>

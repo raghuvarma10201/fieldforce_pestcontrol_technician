@@ -3,6 +3,7 @@ import axiosInstance from "../../../components/ApiInterceptor";
 import { getActiveTaskData } from "../../localstorage/taskUtils";
 import { getCurrentLocation } from "../../providers/GeoLocationProvider";
 
+import { getBusinessId } from "../taskApi/taskDataApi";
 const apiUrl: any = import.meta.env.VITE_API_URL;
 
 /////Get User Data from session Storage///////////
@@ -56,6 +57,7 @@ export const postDataToLocationTracking = async (latitude: number,longitude: num
       track_date: new Date().toISOString().slice(0, 10),
       track_time: formattedTime,
       visit_id: actTaskId,
+      business_id : await getBusinessId()
     }];
     const response = await axiosInstance.post(`${apiUrl}/technician-location-tracking`, requestBody);
     console.log(response);

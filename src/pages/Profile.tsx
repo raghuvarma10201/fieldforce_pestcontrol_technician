@@ -83,45 +83,8 @@ const Profile: React.FC = () => {
     setSelectedLanguage(lng);
     //loadLanguageData(lng);
     i18n.changeLanguage(lng);
-
   };
-  // const cacheLanguageData = async (lang: string, data: string) => {
-  //   await Filesystem.writeFile({
-  //     path: `language_${lang}.json`,
-  //     data,
-  //     directory: Directory.Data,
-  //   });
-  // };
 
-  
-  // const base64ToJson = (base64String: any): object | null => {
-  //   try {
-  //     // Step 1: Fix URL-safe Base64 encoding (if needed)
-  //     base64String = base64String.replace(/-/g, '+').replace(/_/g, '/');
-  //     // Step 2: Add padding if necessary (length should be a multiple of 4)
-  //     while (base64String.length % 4 !== 0) {
-  //       base64String += '=';
-  //     }
-  //     // Step 3: Decode the Base64 string
-  //     const jsonString = atob(base64String);
-  //     // Step 4: Parse the decoded string into JSON
-  //     return JSON.parse(jsonString);
-  //   } catch (error) {
-  //     console.error('Error decoding Base64 string or parsing JSON:', error);
-  //     return null;
-  //   }
-  // };
-
-  // const loadLanguageData = async (lang: string) => {
-  //   try {
-  //     const response = await fetch(`https://rpwebapps.us/clients/fieldforce/resources/lang/${lang}.json`, { mode: 'no-cors' });
-  //     const data = await response.json();
-  //     console.log(data);
-  //     cacheLanguageData(lang, btoa(JSON.stringify(data)));
-  //   } catch (error) {
-  //     console.error('Error loading language data:', error);
-  //   }
-  // };
   return (
     <>
       {!isProd && <EnvironmentRibbon position="ribbon top-right" />}

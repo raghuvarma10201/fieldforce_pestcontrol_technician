@@ -699,7 +699,7 @@ const PestActivityFound: React.FC = () => {
                     >
                       {pestOptions.map((option, index) => (
                         <IonSelectOption key={index} value={option.id}>
-                          {option.pest_report_type}
+                          {option.service_report_type}
                         </IonSelectOption>
                       ))}
                     </IonSelect>

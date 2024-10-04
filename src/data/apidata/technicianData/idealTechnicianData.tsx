@@ -1,6 +1,6 @@
 import axiosInstance from "../../../components/ApiInterceptor";
 import useLongitudeLocation from "../../../components/useLongitudeLocation";
-import { API_BASE_URL } from "../../baseUrl";
+import { getBusinessId } from "../taskApi/taskDataApi";
 
 const apiUrl: any = import.meta.env.VITE_API_URL;
 
@@ -30,6 +30,7 @@ export const fetchIdealTechnicians = async (): Promise<Technician[]> => {
       filters: {
         last_action: "1",
         work_status: "idle",
+        business_id: await getBusinessId()
       },
       pagination: {
         limit: "10",
@@ -61,6 +62,7 @@ export const submitTechnicianData = async (baseImage: any,selectedTechnicianData
   try {
     const requestBody = [
       {
+        business_id : await getBusinessId(),
         visit_id, //Required
         team_count: selectedTechnicianData.length.toString(), //Required
         latitude,
