@@ -39,6 +39,8 @@ import {
 } from "../data/apidata/stockTransferApi/stockTransferApi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getBusinessId } from "../data/apidata/taskApi/taskDataApi";
+import { t } from "i18next";
 
 const StockTransfer: React.FC = () => {
   const history = useHistory();
@@ -237,7 +239,8 @@ const StockTransfer: React.FC = () => {
           "tbl_items.created_on": "asc"
         },
         filters: {
-          "tbl_items.item_name": searchQuery
+          "tbl_items.item_name": searchQuery,
+          "tbl_employee_stock_book.business_id" : await getBusinessId()
         },
         pagination: {
           limit: "10",
@@ -456,7 +459,7 @@ const StockTransfer: React.FC = () => {
           <IonButtons slot="start" className="ion-no-padding">
             <IonBackButton defaultHref={"/"}></IonBackButton>
           </IonButtons>
-          <IonTitle className="ion-float-start">Stock Transfer</IonTitle>
+          <IonTitle className="ion-float-start">{t('stock_transfer','Stock Transfer')}</IonTitle>
           <div className="ion-float-end headerBts">
             <IonButton shape="round" routerLink={"/"}>
               <IonImg src="assets/images/home-outline-icon.svg" />
@@ -498,7 +501,7 @@ const StockTransfer: React.FC = () => {
               />
             ))}
             <IonItem lines="none" className="stockHeadingH1">
-              <h1>Material List</h1>
+              <h1>{t('material','Material')} {t('list','List')}</h1>
               <IonButton
                 id="stockPreviewModal"
                 slot="end"
@@ -522,7 +525,7 @@ const StockTransfer: React.FC = () => {
                         <div className="text">
                           <h3>{data.item_name}</h3>
                           <p className="ion-float-left">
-                            Available Qty:{" "}
+                          {t('available','Available')} {t('quantity','Qty')}:{" "}
                             <IonText className="availableQty">
                               {data.availableQuantity} {data.unitName}
                             </IonText>

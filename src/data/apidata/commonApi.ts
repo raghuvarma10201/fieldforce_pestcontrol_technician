@@ -15,13 +15,27 @@ export const appSettings = async (payload: any) => {
     console.error(error);
   }
 };
+export const getLanguages = async () => {
+  try{
+
+    const response = await axios.get(`${apiUrl}/get-languages-list`);
+    console.log("Language Response"+JSON.stringify(response));
+    return response.data;
+  }
+  catch(error){
+    console.error(error);
+  }
+};
 export const getLanguageFile = async (language: any) => {
-    try{
-      const response = await axios.get(`https://mocki.io/v1/c88ca78a-6557-4e75-ad23-96f3fa6a1327`);
-      console.log("Language Response"+JSON.stringify(response));
-      return response;
+  try{
+    const payload = {
+      "language_id" : language
     }
-    catch(error){
-      console.error(error);
-    }
-  };
+    const response = await axios.post(`${apiUrl}/get-language-labels`, payload);
+    console.log("Language Response"+JSON.stringify(response));
+    return response.data;
+  }
+  catch(error){
+    console.error(error);
+  }
+};

@@ -47,16 +47,18 @@ import { Network } from "@capacitor/network";
 import { submitTaskStart } from "../data/offline/entity/DataTransfer";
 import { toast } from "react-toastify";
 import NotificationLength from "../components/NotificationLength";
+import { useTranslation } from "react-i18next";
 
 
 const TaskDetails: React.FC = () => {
   const params: any = useParams();
+  const { t } = useTranslation();
   // const { id } = useParams<{ id: string }>(); // Dynamically fetch taskId from URL
   const [taskDetails, setTaskDetails] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [isStartingTask, setIsStartingTask] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [nextButton, setNextButton] = useState<string>("Start");
+  const [nextButton, setNextButton] = useState<string>(t('start','Start'));
   const [error, setError] = useState<string | null>(null);
   const [showAlert, setShowAlert] = useState(false);
 
@@ -89,11 +91,11 @@ const TaskDetails: React.FC = () => {
           taskData.service_status === "On Going" ||
           taskData.service_status === "Paused"
         ) {
-          setNextButton("Continue");
+          setNextButton(t('continue','Continue'));
         } else if (taskData.service_status === "Completed") {
-          setNextButton("Close"); // Assuming it should be Close for Completed
+          setNextButton(t('close','Close')); // Assuming it should be Close for Completed
         } else {
-          setNextButton("Start"); // Assuming it should be Start for other statuses
+          setNextButton(t('start','Start')); // Assuming it should be Start for other statuses
         }
         setTaskDetails(taskData);
       } else {
@@ -122,66 +124,66 @@ const TaskDetails: React.FC = () => {
     {
       key: "1",
       icon: "site-location-icon.svg",
-      labelTxt: "Site Location",
-      valueTxt: taskDetails.address || "Not available",
+      labelTxt: t('site','Site')+' '+t('location','Location'),
+      valueTxt: taskDetails.address || "N/A",
     },
     {
       key: "2",
       icon: "service-icon.svg",
-      labelTxt: "Service",
-      valueTxt: taskDetails.service_name || "Not available",
+      labelTxt: t('service','Service'),
+      valueTxt: taskDetails.service_name || "N/A",
     },
     {
       key: "3",
       icon: "transaction-id-icon.svg",
-      labelTxt: "Transaction ID",
-      valueTxt: taskDetails.reference_number || "Not available",
+      labelTxt: t('reference_number','Reference No'),
+      valueTxt: taskDetails.reference_number || "N/A",
     },
     {
       key: "4",
       icon: "contact-icon.svg",
-      labelTxt: "Contact Person Name",
-      valueTxt: taskDetails.customer_name || "Not available",
+      labelTxt: t('contact','Contact')+' '+t('person','Person')+' '+t('name','Name'),
+      valueTxt: taskDetails.customer_name || "N/A",
     },
     {
       key: "5",
       icon: "contact-icon.svg",
-      labelTxt: "Contact Mobile",
-      valueTxt: taskDetails.mobile_no || "Not available",
+      labelTxt: t('contact','Contact')+' '+t('mobile','Mobile'),
+      valueTxt: taskDetails.mobile_no || "N/A",
     },
     {
       key: "6",
       icon: "appointment-icon.svg",
-      labelTxt: "Appointment Date",
+      labelTxt: t('appointment','Appointment')+' '+t('date','Date'),
       valueTxt: taskDetails.service_date
         ? formatDate(taskDetails.service_date) +
           " " +
           taskDetails.preffered_time
-        : "Not available",
+        : "N/A",
     },
     {
       key: "7",
       icon: "treatment-type-icon.svg",
-      labelTxt: "Treatment Type",
+      labelTxt: t('treatment_type','Treatment type'),
       valueTxt: taskDetails.treatment_type
         ? taskDetails.treatment_type
             .map((type: any) => type.treatment)
             .join(", ")
-        : "Not available",
+        : "N/A",
     },
     {
       key: "8",
       icon: "pest-covered-icon.svg",
-      labelTxt: "Pest Covered",
+      labelTxt: t('service','Service')+' '+t('activity','Activity'),
       valueTxt: taskDetails.pest_covered
         ? taskDetails.pest_covered.map((pest: any) => pest.pest).join(", ")
-        : "Not available",
+        : "N/A",
     },
     {
       key: "9",
       icon: "area-icon.svg",
-      labelTxt: "Area",
-      valueTxt: "Not available",
+      labelTxt: t('area','Area'),
+      valueTxt: "N/A",
     },
   ];
 
@@ -330,7 +332,7 @@ const TaskDetails: React.FC = () => {
           <IonButtons slot="start" className="ion-no-padding">
             <IonBackButton defaultHref={"/"}></IonBackButton>
           </IonButtons>
-          <IonTitle className="ion-float-start"> Task Details</IonTitle>
+          <IonTitle className="ion-float-start"> {t('task_details','Task Details')}</IonTitle>
           <div className="ion-float-end headerBts">
             <IonButton shape="round" routerLink={"/"}>
               <IonImg src="assets/images/home-outline-icon.svg" />
@@ -376,7 +378,7 @@ const TaskDetails: React.FC = () => {
               taskDetails.service_status === "Paused"
             }
           >
-            Reschedule
+            {t('reschedule','Reschedule')}
           </IonButton>
           <IonButton
             className="ion-button"

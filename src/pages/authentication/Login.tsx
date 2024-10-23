@@ -86,11 +86,17 @@ const Login: React.FC = () => {
           console.log("hi")
           toast.success(response.data.message);
           console.log(response.data.data[0].role_name, "rolename");
-          const userData = response.data.data[0]
+          const userData = response.data.data[0];
+          let subscription = {
+            startDate : response.data.data.start_date,
+            endDate : response.data.data.end_date
+          }
           if (userData.last_action === "1") {
             try {
               await userCheckIns(userData);
-              //localStorage.setItem("userData", JSON.stringify(userData));
+              localStorage.setItem("userData", JSON.stringify(userData));
+              
+              localStorage.setItem("subscription", JSON.stringify(subscription));
               history.push("/dashboard");
 
             } catch (error) {
@@ -99,6 +105,7 @@ const Login: React.FC = () => {
 
 
           } else {
+            localStorage.setItem("subscription", JSON.stringify(subscription));
             localStorage.setItem("userData", JSON.stringify(response.data.data[0]));
             history.push("/home");
           }

@@ -1269,7 +1269,7 @@ ion-card.logOutCard {
         --background: #fff;
         padding-left: 10px !important;
         min-height: 56px !important;
-        border-bottom: solid 1px #CCBBBB;
+        border: solid 1px #CCBBBB;
         box-shadow: 0px 2px 7px rgba(206, 186, 186, 0.71);
         margin-bottom: 10px !important;
     }
@@ -3566,7 +3566,6 @@ ion-item-group.sigIonGroup {
     }
 
     .previewWrpp {
-
         ion-card {
             padding-bottom: 0px;
             padding-top: 0px;
@@ -3582,4 +3581,12 @@ ion-item-group.sigIonGroup {
         }
 
     }
+}
+.updateImage{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 25px;
+    height: 25px;
+    color: #fff;
 }

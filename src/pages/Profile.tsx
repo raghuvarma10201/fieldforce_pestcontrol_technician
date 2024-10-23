@@ -23,6 +23,7 @@ import { useAuth } from "../components/AuthContext";
 import EnvironmentRibbon from "../components/EnvironmentRibbon";
 import i18n from "../i18n";
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { getLanguageFile, getLanguages } from "../data/apidata/commonApi";
 
 const isProd: any = import.meta.env.PROD;
 
@@ -33,10 +34,12 @@ const Profile: React.FC = () => {
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
   const app_version: any = localStorage.getItem('app_version');
   const app_name: any = localStorage.getItem('app_name');
+  const [languages, setLanguages] = useState<any[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(localStorage.getItem('language') || 'en');
 
 
   useEffect(() => {
+    fetchLanguages();
     const userDataString = localStorage.getItem("userData");
     if (userDataString) {
       const userData = JSON.parse(userDataString);
@@ -78,13 +81,37 @@ const Profile: React.FC = () => {
       history.push('/login');
     }
   };
-  const changeLanguage = (lng: any) => {
+  const changeLanguage = async (lng: any) => {
     localStorage.setItem('language', lng);
     setSelectedLanguage(lng);
-    //loadLanguageData(lng);
     i18n.changeLanguage(lng);
+    const translations = await fetchTranslations(lng);
+    i18n.addResourceBundle(lng, 'translation', translations);
   };
-
+  const fetchLanguages = async () => {
+    try {
+      const response = await getLanguages();
+      console.log(response);
+      if (!response) throw new Error('Network response was not ok');
+      const languages = response.data;
+      setLanguages(languages);
+    } catch (error) {
+      console.error('Error fetching translations:', error);
+      return {};
+    }
+  };
+  const fetchTranslations = async (lang: any) => {
+    try {
+      const response = await getLanguageFile(lang);
+      console.log(response);
+      if (!response) throw new Error('Network response was not ok');
+      const translations = response.data;
+      return translations;
+    } catch (error) {
+      console.error('Error fetching translations:', error);
+      return {};
+    }
+  };
   return (
     <>
       {!isProd && <EnvironmentRibbon position="ribbon top-right" />}
@@ -195,9 +222,11 @@ const Profile: React.FC = () => {
                 changeLanguage(selectedValue);
               }}
             >
-              <IonSelectOption value="en">English</IonSelectOption>
-              <IonSelectOption value="es">Spain</IonSelectOption>
-              <IonSelectOption value="ar">Arabic</IonSelectOption>
+              {languages.map((option, index) => (
+                <IonSelectOption key={index} value={option.id}>
+                  {option.language_name}
+                </IonSelectOption>
+              ))}
             </IonSelect>
           </div>
 

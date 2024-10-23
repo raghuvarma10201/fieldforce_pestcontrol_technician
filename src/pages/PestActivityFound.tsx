@@ -63,6 +63,7 @@ import {
 import { Network } from "@capacitor/network";
 import { toast } from "react-toastify";
 import { Storage } from "@ionic/storage";
+import { t } from "i18next";
 // import {retrievepestActivity} from "../data/offline/entity/DataTransfer"
 const PestActivityFound: React.FC = () => {
   const location = useLongitudeLocation();
@@ -716,7 +717,7 @@ const PestActivityFound: React.FC = () => {
                     <IonItem lines="none">
                       <div className="width100">
                         <IonLabel className="ion-label">
-                          Activity Level <IonText>*</IonText>
+                        {t('activity','Activity')} {t('level','Level')} <IonText>*</IonText>
                         </IonLabel>
                         <IonSelect
                           value={item.pest_severity}
@@ -752,7 +753,7 @@ const PestActivityFound: React.FC = () => {
                 <IonItem lines="none">
                   <div className="width100">
                     <IonLabel className="ion-label">
-                      Area<IonText>*</IonText>
+                    {t('area','Area')}<IonText>*</IonText>
                     </IonLabel>
                     <IonInput
                       value={item.pest_area} // Bind value to state variable
@@ -783,7 +784,7 @@ const PestActivityFound: React.FC = () => {
                 <IonItem lines="none">
                   <div className="ion-padding-bottom">
                     <IonLabel className="ion-label">
-                      Photo of Pest Found <IonText>*</IonText>
+                      Photo of Service Activity <IonText>*</IonText>
                     </IonLabel>
                     {/* <input
                     type="file"
@@ -888,7 +889,7 @@ const PestActivityFound: React.FC = () => {
                 color="medium"
                 onClick={handleCancel}
               >
-                RESET
+                {t('reset','Reset')}
               </IonButton>
               <IonButton
                 className="ion-button"
@@ -896,7 +897,7 @@ const PestActivityFound: React.FC = () => {
                 type="submit"
                 //   disabled={submitting || !isFormValid}
               >
-                SUBMIT
+                {t('submit','Submit')}
               </IonButton>
             </IonToolbar>
           </IonFooter>

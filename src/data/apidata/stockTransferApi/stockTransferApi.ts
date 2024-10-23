@@ -1,4 +1,5 @@
 import axiosInstance from "../../../components/ApiInterceptor";
+import { getBusinessId } from "../taskApi/taskDataApi";
 
 const apiUrl: any = import.meta.env.VITE_API_URL;
 
@@ -56,6 +57,7 @@ export const transferStock = async (toId: any, materials: any) => {
   try {
     const requestBody = {
       "to_technician_id": toId,
+      "business_id" : await getBusinessId(),
       "item_details": materials
     };
     const response = await axiosInstance.post(`${apiUrl}/transfer-stock-by-technician`, requestBody);
@@ -87,7 +89,8 @@ export const techniciansStockTransferred = async (page: any) => {
         "tbl_stock_transfer.created_on": "desc"
       },
       "filters": {
-        "search": ""
+        "search": "",
+        "tbl_stock_transfer.business_id" : await getBusinessId()
       },
       "custom-filters": {
         "operation_type": "TRANSFERRED"
@@ -127,7 +130,8 @@ export const techniciansStockRecieved = async (page: any) => {
         "tbl_stock_transfer.created_on": "desc"
       },
       "filters": {
-        "search": ""
+        "search": "",
+        "tbl_stock_transfer.business_id" : await getBusinessId()
       },
       "custom-filters": {
         "operation_type": "RECEIVED"
@@ -174,7 +178,8 @@ export const transferedRecievedDetail = async (id: any, segment: any) => {
         "tbl_items.item_name": "asc"
       },
       "filters": {
-        "tbl_stock_item_transfer.stock_transfer_id": id
+        "tbl_stock_item_transfer.stock_transfer_id": id,
+        "tbl_stock_transfer.business_id" : await getBusinessId()
       },
       "custom-filters": {
         "operation_type": segment

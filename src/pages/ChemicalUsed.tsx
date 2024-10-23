@@ -50,6 +50,7 @@ import {
   retrieveNetworkInitTimes,
   retrieveNetworkTasksExecutionDetails,
 } from "../data/offline/entity/DataRetriever";
+import { t } from "i18next";
 interface UsageItem {
   service_id: string;
   item_id: string;
@@ -869,7 +870,7 @@ const ChemicalUsed = () => {
                   <IonText className="listCont">
                     <>
                       <h2>{data?.pest_report_type}</h2>
-                      <h5>Pest Activity Found</h5>
+                      <h5>{t('service','Service')} {t('activity','Activity')}</h5>
                     </>
                   </IonText>
                 </IonItem>

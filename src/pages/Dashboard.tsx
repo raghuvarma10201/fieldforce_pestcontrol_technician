@@ -366,7 +366,7 @@ const Dashboard: React.FC = () => {
           </IonItem>
 
           <IonText className="welcomeText">
-            <h2>{t('welcome_text')}</h2>
+            <h2>{t('welcome_text','Welcome to Fieldforce')}</h2>
             <h1> {userData?.first_name} {userData?.last_name}</h1>
             <h6>{userData?.role_name}</h6>
           </IonText>
@@ -379,7 +379,7 @@ const Dashboard: React.FC = () => {
                     <h3>{totalTasks}</h3>
                   </IonText>
                   <IonText>
-                    <h5>Total Tasks</h5>
+                    <h5>{t('total_tasks','Total Tasks')} </h5>
                   </IonText>
                 </IonCard>
               </IonCol>
@@ -389,7 +389,7 @@ const Dashboard: React.FC = () => {
                     <h3 className="completedColor">{completedTasks}</h3>
                   </IonText>
                   <IonText>
-                    <h5>Completed</h5>
+                    <h5>{t('completed','Completed')}</h5>
                   </IonText>
                 </IonCard>
               </IonCol>
@@ -399,7 +399,7 @@ const Dashboard: React.FC = () => {
                     <h3 className="expiredcolor">{expiredTasks}</h3>
                   </IonText>
                   <IonText>
-                    <h5>Expired</h5>
+                    <h5>{t('expired','Expired')}</h5>
                   </IonText>
                 </IonCard>
               </IonCol>

@@ -216,7 +216,7 @@ const Home: React.FC = () => {
             <IonRow>
               <IonCol size="4">
                 <IonCard onClick={handleCheckIn}>
-                <IonText>{t('check_in')}</IonText>
+                <IonText>{t('check_in','Check In')}</IonText>
                   <IonImg src="assets/images/checkin-icon.svg" />
                 
                 </IonCard>
@@ -241,7 +241,7 @@ const Home: React.FC = () => {
 
               <IonCol size="4">
                 <IonCard routerLink={"/LeaveRequestList"}>
-                <IonText>{t('apply_leave')}</IonText>
+                <IonText>{t('apply_leave','Apply Leave')}</IonText>
                   <IonImg src="assets/images/apply-leave-icon.svg" />
                  
                 </IonCard>
@@ -250,7 +250,7 @@ const Home: React.FC = () => {
                 size="4"
               >
                 <IonCard className="ion-nomargin" routerLink={"/stocktransfer"}>
-                <IonText>{t('stock_transfer')}</IonText>
+                <IonText>{t('stock_transfer','Stock Transfer')}</IonText>
                   <IonImg src="assets/images/stock-transfer-home-icon.svg"></IonImg>
                  
                 </IonCard>
@@ -260,7 +260,7 @@ const Home: React.FC = () => {
                 size="4"
               >
                 <IonCard className="ion-nomargin logOutCard" onClick={handleLogout}>
-                <IonText>{t('logout')}</IonText>
+                <IonText>{t('logout','Logout')}</IonText>
                   <IonImg src="assets/images/logout-icon.svg"></IonImg>
                  
                 </IonCard>

@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import Home from "./pages/Home";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 /* Core CSS required for Ionic components to work properly */
@@ -56,7 +56,7 @@ import Profile from "./pages/Profile";
 import LeaveRequestList from "./pages/leaves/LeaveRequestList";
 import ApplyLeave from "./pages/leaves/ApplyLeave";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Geolocation } from "@capacitor/geolocation";
 import { getCurrentLocation } from "./data/providers/GeoLocationProvider";
 // import { IonButton, IonLoading, IonToast } from '@ionic/react';
@@ -80,6 +80,7 @@ import { Device } from "@capacitor/device";
 import NetworkSpeedCheck from "./components/NetworkSpeedCheck";
 import NetworkStatus from "./components/NetworkStatus";
 import { AuthProvider } from "./components/AuthContext";
+import { useAuth } from "./components/AuthContext";
 import AuthGuard from "./components/AuthGuard";
 import EnvironmentRibbon from "./components/EnvironmentRibbon";
 import i18n from './i18n';
@@ -87,10 +88,10 @@ import { Directory, Encoding } from '@capacitor/filesystem';
 import { Plugins } from "@capacitor/core";
 import { appSettings, getLanguageFile } from "./data/apidata/commonApi";
 import AppUpdate from "./components/AppUpdate";
+import axiosInstance from "./components/ApiInterceptor";
 const { Filesystem } = Plugins;
 const apiUrl: any = import.meta.env.VITE_API_URL;
 const isProd: any = import.meta.env.PROD;
-
 setupIonicReact();
 const getUserId = () => {
   const userDataString = localStorage.getItem("userData");
@@ -102,13 +103,100 @@ const getUserId = () => {
 };
 
 const App: React.FC = () => {
+  
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [position, setPosition] = useState<any>();
   const [appInfo, setAppInfo] = useState<any>([]);
   const [appVersion, setAppVersion] = useState<string>('');
   const history = useHistory();
+  const { logout } = useAuth();
 
+  useEffect(() => {
+    localStorage.setItem('app_name', 'pest_control');
+    Device.getLanguageCode().then(async (lang) => {
+      const languageCode = localStorage.getItem('language') || 'en'; // Extract language code from locale
+      i18n.changeLanguage(languageCode);
+      const translations = await fetchTranslations(languageCode);
+      i18n.addResourceBundle(languageCode, 'translation', translations);
+    });
+    checkSubscription();
+    handlePlatform();
+    registerPushHandlers();
+    console.log("Checking User session");
+    const checkInFlag = localStorage.getItem("checkInFlag");
+    if (checkIfLoggedIn()) {
+      pollLocation(); // Fetch geolocation immediately
+      const geolocationInterval = setInterval(pollLocation, 60000); // Fetch geolocation every 1 minute
+      // User Logged in Navigate to Home or Technician Dashboard
+      console.log("User session valid");
+      // Clear intervals on component unmount
+      return () => {
+        clearInterval(geolocationInterval);
+      };
+    } else {
+      console.log("User session NOT valid. DO NOT POLL Location.");
+    }
+  }, []);
+  const checkSubscription = async () => {
+    const subscriptionData = localStorage.getItem("subscription");
+    if (subscriptionData) {
+      const subscription = JSON.parse(subscriptionData);
+      console.log("Subscription", subscription);
+      // Get today's date
+      const today = new Date();
+
+      // Replace these with the start and end dates you want to compare (YYYY-MM-DD format)
+      const startDate = new Date(subscription.startDate);
+      const endDate = new Date(subscription.endDate);
+
+      // Reset the time to compare only the date (ignores hours, minutes, etc.)
+      today.setHours(0, 0, 0, 0);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
+
+      // Check if today is between the start date and end date
+      if (today >= startDate && today <= endDate) {
+        console.log('Valid subscription')
+      } else {
+        toast.dismiss();
+        toast.error('Your subscription might have ended, please try again or contact your administrator');
+        try {
+          const response = await axiosInstance.post(apiUrl + '/logout', {}, { headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' } });
+          console.log('API Response:', response.data);
+          const keysToKeep = ['device_token', 'username', 'password','rememberMe'];
+          const savedValues = keysToKeep.map(key => ({ key, value: localStorage.getItem(key) }));
+          localStorage.clear();
+          savedValues.forEach(({ key, value }) => {
+            if (value !== null) {
+              localStorage.setItem(key, value);
+            }
+          });
+          console.log("Logout Response", response);
+          if (response && response.data.status == 200 && response.data.success) {
+            history.push('/login');
+          }
+      }
+      catch (error: any) {
+          return error.response
+          // console.log(error);
+      }
+       
+      }
+    }
+  };
+  const fetchTranslations = async (lang: any) => {
+    try {
+      const response = await getLanguageFile(lang);
+      console.log(response);
+      if (!response) throw new Error('Network response was not ok');
+      const translations = response.data;
+      return translations;
+    } catch (error) {
+      console.error('Error fetching translations:', error);
+      return {};
+    }
+  };
   const checkIfLoggedIn = () => {
     const userDataString = localStorage.getItem("userData");
 
@@ -156,7 +244,6 @@ const App: React.FC = () => {
         console.log(GoogleKey);
         if (GoogleKey) {
           localStorage.setItem('Google_Map_API_Key', GoogleKey.description);
-
         }
       }
       const info = await Device.getInfo();
@@ -181,51 +268,12 @@ const App: React.FC = () => {
       console.log(appVersion);
     }
   }
-  useEffect(() => {
-    localStorage.setItem('app_name', 'pest_control');
-    Device.getLanguageCode().then(async (lang) => {
-      const languageCode = localStorage.getItem('language') || 'en'; // Extract language code from locale
-      i18n.changeLanguage(languageCode);
-      const translations = await fetchTranslations(languageCode);
-      i18n.addResourceBundle(languageCode, 'translation', translations);
-    });
-    const fetchTranslations = async (lang: any) => {
-      try {
-        const response = await getLanguageFile(lang);
-        console.log(response);
-        if (!response) throw new Error('Network response was not ok');
-        const translations = response.data;
-        return translations;
-      } catch (error) {
-        console.error('Error fetching translations:', error);
-        return {};
-      }
-    };
-    //loadLanguageData(language);
-    handlePlatform();
-    registerPushHandlers();
-    console.log("Checking User session");
-    const checkInFlag = localStorage.getItem("checkInFlag");
-
-    if (checkIfLoggedIn()) {
-      pollLocation(); // Fetch geolocation immediately
-      const geolocationInterval = setInterval(pollLocation, 60000); // Fetch geolocation every 1 minute
-      // User Logged in Navigate to Home or Technician Dashboard
-      console.log("User session valid");
-      // Clear intervals on component unmount
-      return () => {
-        clearInterval(geolocationInterval);
-      };
-    } else {
-      console.log("User session NOT valid. DO NOT POLL Location.");
-    }
-  }, []);
   return (
     <IonApp>
       <NetworkStatus />
       <ToastContainer />
       <AuthProvider>
-      <AppUpdate/>
+        <AppUpdate />
         <IonReactRouter>
           <NetworkSpeedCheck />
           <IonRouterOutlet>

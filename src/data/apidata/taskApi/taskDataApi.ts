@@ -568,7 +568,10 @@ export const timeDuration = async () => {
 
 export const customerType = async () => {
   try {
-    const response = await axiosInstance.get(`${apiUrl}/get-clienttypes`);
+    const payload = {
+      business_id : await getBusinessId()
+    }
+    const response = await axiosInstance.post(`${apiUrl}/get-clienttypes`,payload);
     console.log(response);
     return response.data;
   }
@@ -579,7 +582,10 @@ export const customerType = async () => {
 
 export const getAreas = async () => {
   try {
-    const response = await axiosInstance.get(`${apiUrl}/get-areas`);
+    const payload = {
+      business_id : await getBusinessId()
+    }
+    const response = await axiosInstance.post(`${apiUrl}/get-areas`,payload);
     console.log(response);
     return response.data;
   }
@@ -634,6 +640,7 @@ export const fetchQuestionnaire = async () => {
   const service_id = activeTaskData.service_id;
   try {
     const requestBody = {
+      business_id : await getBusinessId(),
       service_id: service_id,
     };
     const response = await axiosInstance.post(`${apiUrl}/get-work-done-questionnaire`, requestBody);
