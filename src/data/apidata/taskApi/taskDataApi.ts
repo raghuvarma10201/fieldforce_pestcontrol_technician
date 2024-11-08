@@ -148,10 +148,11 @@ export const completedTaskData = async (latitude: number,longitude: number) => {
       ],
       order_by: {
         // "tbl_visits.created_on": "asc",
-        "tbl_visits.service_completed": "desc",
+        "tbl_visits.service_completed": "desc"
       },
       filters: {
-        "tbl_visits.service_status": "18",
+        "tbl_visits.business_id" : await getBusinessId(),
+        "tbl_visits.service_status": "18"
       },
       pagination: {
         limit: "0",
@@ -204,7 +205,7 @@ export const taskInit = async (visit_id: string,formattedDate: string,log_type: 
     ];
     const response = await axiosInstance.post(`${apiUrl}/task-initiate`, requestBody);
     console.log(response);
-    return response.data[0];
+    return response.data;
   }
   catch (error) {
     throw error;
@@ -596,6 +597,7 @@ export const getAreas = async () => {
 
 export const addCustomer = async (requestBody: any) => {
   try {
+    requestBody.business_id = await getBusinessId();
     const response = await axiosInstance.post(`${apiUrl}/add-customer`,requestBody);
     console.log(response);
     return response.data;

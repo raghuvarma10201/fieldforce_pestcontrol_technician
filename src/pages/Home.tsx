@@ -94,6 +94,7 @@ const Home: React.FC = () => {
         setCheckLoading(false);
         setError(response.message);
         if (response.is_chemicals_required) {
+          setLoading(false);
           setShowAlert(true);
         }
       }
@@ -197,7 +198,7 @@ const Home: React.FC = () => {
                           <div>
                           {userData && (
                             <IonText>
-                              <h5>{t('welcome_text')}</h5>
+                              <h5>{t('welcome_text','Welcome to Fieldforce')}</h5>
                               <h1>
                                 {userData.first_name} {userData.last_name}
                               </h1>

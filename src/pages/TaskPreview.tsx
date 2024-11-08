@@ -21,6 +21,9 @@ import {
   IonSearchbar,
   IonBadge,
   IonGrid,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
 } from "@ionic/react";
 import { useHistory, useLocation, useParams } from "react-router";
 import CustomBackButton from "../components/CustomBackButton";
@@ -101,21 +104,6 @@ const TaskPreview: React.FC = () => {
       }
 
       const userData = JSON.parse(userDataString);
-      // try {
-      //   const requestBody = {
-      //     visit_id: visitId,
-      //   }
-
-      //   const responseData = await fetchvisitExecutionpreview(requestBody);
-
-      //   console.log(
-      //     "using data for taskpreview------------------------------->",
-      //     responseData
-      //   );
-
-      //   let res = responseData.data;
-      //   setFormData(res);
-      // }
 
       try {
         const visitExecutionDetails =
@@ -128,6 +116,8 @@ const TaskPreview: React.FC = () => {
             visitExecutionDetails
           );
           // Assuming setFormData is a function to update your component state
+          visitExecutionDetails.pests_recommendations = groupMcqRecommendations(visitExecutionDetails.pests_recommendations,visitExecutionDetails.pests_recommendations_image_path);
+          //console.log(xvdgf);
           setFormData(visitExecutionDetails);
         } else {
           console.log(
@@ -146,6 +136,48 @@ const TaskPreview: React.FC = () => {
   }, []);
   console.log(formData);
 
+  const groupMcqRecommendations = (
+    selectedRecommendations: any[],path : any): any[] => {
+    const grouped: any[] = [];
+    const uniqueDescriptions: { [key: string]: Set<string> } = {};
+
+    selectedRecommendations.forEach(({ question,question_id, option_id, type, descriptive }) => {
+      if(type === 'file'){
+        descriptive = path+''+descriptive;
+      }
+      const existingItem = grouped.find(
+        (item) => item.question_id === question_id
+      );
+
+      if (existingItem) {
+        //existingItem.recommendation_id += `,${id}`;
+        if (option_id) {
+          if (!uniqueDescriptions[question_id]) {
+            uniqueDescriptions[question_id] = new Set();
+          }
+          if (!uniqueDescriptions[question_id].has(option_id)) {
+            uniqueDescriptions[question_id].add(option_id);
+            existingItem.option_id += `, ${option_id}`;
+          }
+          if (!uniqueDescriptions[question_id].has(descriptive)) {
+            uniqueDescriptions[question_id].add(descriptive);
+            existingItem.descriptive += `, ${descriptive}`;
+          }
+        }
+      } else {
+        grouped.push({
+          question: question,
+          question_id: question_id,
+          option_id: option_id,
+          dependency_label_text: '',
+          descriptive: descriptive,
+          type: type
+        });
+      }
+    });
+    console.log(grouped);
+    return grouped;
+  };
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === "#pestActivitySection") {
@@ -205,19 +237,18 @@ const TaskPreview: React.FC = () => {
         <div className="ionPaddingBottom">
           <IonCard>
             <IonText className="siteName">
-              <IonText className="previewHeading">
-                <h2>Site Name</h2>
-              </IonText>
+              <IonCardHeader>
+                <IonCardTitle>Site Name</IonCardTitle>
+              </IonCardHeader>
               {formData && formData.site_name && <h3>{formData.site_name}</h3>}
             </IonText>
           </IonCard>
 
           {/* Team Attendance  */}
           <IonCard className="ion-padding-horizontal">
-            <IonText className="previewHeading">
-              <h2>Team Attendance</h2>
-            </IonText>
-
+            <IonCardHeader>
+              <IonCardTitle>Team Attendance</IonCardTitle>
+            </IonCardHeader>
             {/* Display only one technician */}
             {formData && formData.team && formData.team.length > 0 && (
               <IonList className="listItemAll">
@@ -238,7 +269,7 @@ const TaskPreview: React.FC = () => {
               <IonList lines="full" className="ion-list-item listItemAll">
                 <IonText className="previewHeading">
                   <h3>Selected Technicians</h3>
-                  <IonBadge color="primary">{formData.team.length-1}</IonBadge>
+                  <IonBadge color="primary">{formData.team.length - 1}</IonBadge>
                 </IonText>
                 {formData.team.slice(1).map((technician: any, index: any) => (
                   <IonItem key={index}>
@@ -249,7 +280,7 @@ const TaskPreview: React.FC = () => {
                       <h4>{technician.first_name}</h4>
                       <h6>{technician.mobile_no}</h6>
                     </IonText>
-                          
+
                   </IonItem>
                 ))}
               </IonList>
@@ -257,22 +288,22 @@ const TaskPreview: React.FC = () => {
           </IonCard>
 
           <IonCard className="ion-padding-horizontal preTaskInitiation">
-            <IonText className="previewHeading">
-              <h2>Task Initiation</h2>
-            </IonText>
+            <IonCardHeader>
+              <IonCardTitle>Task Initiation</IonCardTitle>
+            </IonCardHeader>
             {formData &&
               formData?.task_initiation &&
               formData?.task_initiation.length > 0 &&
               formData?.task_initiation.map(
                 (initiation: any, index: number) => (
-                  <IonCard key={index}>
+                  <IonCard className="innerCard" key={index}>
                     <IonText>
                       <p>
                         Date and Time: <span>{" "}
-                        {formatDate(initiation?.date_time) +
-                          " " +
-                          formatTime(initiation?.date_time)}
-                          </span>
+                          {formatDate(initiation?.date_time) +
+                            " " +
+                            formatTime(initiation?.date_time)}
+                        </span>
                       </p>
                       <p>Log Type: <span>{initiation?.log_type}</span></p>
                       <p>Tracking Type: <span>{initiation?.tracking_type}</span></p>
@@ -289,9 +320,9 @@ const TaskPreview: React.FC = () => {
 
           {/* Pest Activity Found Details */}
           <IonCard className="ion-padding-horizontal" id="pestActivitySection">
-            <IonText className="previewHeading">
-              <h2>Pest Activity Found Details</h2>
-            </IonText>
+            <IonCardHeader>
+              <IonCardTitle>Service Activity Details</IonCardTitle>
+            </IonCardHeader>
             {formData?.pests_found &&
               formData.pests_found.length > 0 &&
               formData.pests_found.map((pest: any) => {
@@ -304,32 +335,32 @@ const TaskPreview: React.FC = () => {
                 console.log("Pest Photos:", pestPhotos);
 
                 return (
-                  <IonCard key={pest.id}>
+                  <IonCard className="innerCard" key={pest.id}>
                     <div className="preCont">
                       <div className="bottomLine">
                         <IonText>
-                          <h6>Pest Activity Found</h6>
-                          <h2>{pest.pest_report_type}</h2>
+                          <h2>Service Activity Type</h2>
+                          <h4>{pest.service_report_type}</h4>
                         </IonText>
                         <IonText>
-                          <h6>Pest Found</h6>
+                          <h2>Service Activity Done</h2>
                           <h4>{pest.is_pest_found}</h4>
                         </IonText>
                         <IonText>
-                          <h6>Activity Level</h6>
+                          <h2>Activity Level</h2>
                           <h4>{pest.pest_severity}</h4>
                         </IonText>
                         <IonText>
-                          <h6>Chemical added</h6>
+                          <h2>Chemical added</h2>
                           <h4>{pest.is_chemical_added}</h4>
                         </IonText>
                         <IonText>
-                          <h6>Area</h6>
+                          <h2>Area</h2>
                           <h4>{pest.pest_area}</h4>
                         </IonText>
 
                         <IonText>
-                          <h6>Photo of Pest Found</h6>
+                          <h2>Photo of Service Activity</h2>
                         </IonText>
                         {pestPhotos.map((media: any, index: any) => {
                           const fullImagePath = `${imagePath}${media}`;
@@ -344,10 +375,9 @@ const TaskPreview: React.FC = () => {
 
           {/* Chemical Used */}
           <IonCard className="ion-padding-horizontal">
-            <IonText className="previewHeading">
-              <h2>Chemical Used</h2>
-              <h2>{formData.pest_report_type}</h2>
-            </IonText>
+            <IonCardHeader>
+              <IonCardTitle>Chemical Used</IonCardTitle>
+            </IonCardHeader>
 
             <div className="preCont">
               {formData.materials_used && formData.materials_used.length > 0 ? (
@@ -381,68 +411,45 @@ const TaskPreview: React.FC = () => {
 
           {/* Recommendations */}
           <IonCard className="ion-padding-horizontal">
-            <IonText className="previewHeading">
+            <IonCardHeader>
+              <IonCardTitle>Recommendations</IonCardTitle>
+            </IonCardHeader>
+            {/* <IonText className="previewHeading">
               <h2>Recommendations</h2>
-            </IonText>
-            {formData &&
-              formData.pests_recommendations &&
-              formData.pests_recommendations.length > 0 &&
-              formData.pests_recommendations.map(
-                (recommendation: any, index: number) => (
-                  <IonCard key={index} className="innerCard">
-                    <div className="bottomLine">
-                      <div className="preCont">
-                        <IonText>
-                          <h6>Pest Activity Found</h6>
-                          <h2>{recommendation.pest_report_type || "N/A"}</h2>
+            </IonText> */}
+
+            <IonCard className="innerCard">
+              <div className="bottomLine">
+                <div className="preCont">
+                  {formData &&
+                    formData.pests_recommendations &&
+                    formData.pests_recommendations.length > 0 &&
+                    formData.pests_recommendations.map(
+                      (recommendation: any, index: number) => (
+                        <IonText key={index} >
+                          <h2>{recommendation.question}</h2>
+                          {recommendation.type === "file" && (
+                            
+                          <IonImg key={index} src={recommendation.descriptive}/>
+                          )}
+                          {recommendation.type !== "file" && (
+                            <h4>{recommendation.descriptive || "N/A"}</h4>
+                          )}
+                          
                         </IonText>
-                        <IonText>
-                          <h6>Do you want to add recommendations?</h6>
-                          <h4>
-                            {recommendation.is_recommendation_added || "N/A"}
-                          </h4>
-                        </IonText>
-                        <IonText>
-                          <h6>Recommendation Type</h6>
-                          <h4>{recommendation.recommendation_type || "N/A"}</h4>
-                        </IonText>
-                        <IonText>
-                          <h6>Recommendation</h6>
-                          <h4>{recommendation.recommendations || "N/A"}</h4>
-                        </IonText>
-                        <IonText>
-                          <h6>PSD able to Provide Service?</h6>
-                          <h4>
-                            {recommendation.is_service_available || "N/A"}
-                          </h4>
-                        </IonText>
-                        <IonText>
-                          <h6>Photo of Recommendations</h6>
-                        </IonText>
-                        {recommendation.recommended_media.length > 0 ? (
-                          recommendation.recommended_media.map(
-                            (media: any, mediaIndex: number) => (
-                              <IonImg
-                                key={mediaIndex}
-                                src={`${formData.pests_recommendations_image_path}${media}`}
-                              />
-                            )
-                          )
-                        ) : (
-                          <IonText>No media available</IonText>
-                        )}
-                      </div>
-                    </div>
-                  </IonCard>
-                )
-              )}
+                      )
+                    )}
+                </div>
+              </div>
+            </IonCard>
+
           </IonCard>
 
           {/* Work Done Details */}
           <IonCard className="ion-padding-horizontal">
-            <IonText className="previewHeading">
-              <h2>Work Done Details</h2>
-            </IonText>
+            <IonCardHeader>
+              <IonCardTitle>Work Done Details</IonCardTitle>
+            </IonCardHeader>
             {formData &&
               formData.work_done_details &&
               formData.work_done_details.length > 0 && (
@@ -457,21 +464,21 @@ const TaskPreview: React.FC = () => {
                           )}
                           {workDetail.type.toLowerCase() === "selection" &&
                             workDetail.selection_type.toLowerCase() ===
-                              "single" && <h4>{workDetail.options}</h4>}
+                            "single" && <h4>{workDetail.options}</h4>}
                           {workDetail.type.toLowerCase() === "mcq" &&
                             workDetail.selection_type.toLowerCase() ===
-                              "single" && <h4>{workDetail.options}</h4>}
+                            "single" && <h4>{workDetail.options}</h4>}
                           {workDetail.type.toLowerCase() === "mcq" &&
                             workDetail.selection_type.toLowerCase() ===
-                              "multi" && <h4>{workDetail.options}</h4>}
+                            "multi" && <h4>{workDetail.options}</h4>}
                           {workDetail.type.toLowerCase() === "selection" &&
                             workDetail.selection_type.toLowerCase() ===
-                              "multiple" && <h4>{workDetail.options}</h4>}
+                            "multiple" && <h4>{workDetail.options}</h4>}
                           {/* Display dependency_label_text if options is null */}
-                          {workDetail.had_dependency ==1 && (
+                          {workDetail.had_dependency == 1 && (
                             <>
-                           <h6> {workDetail.dependency_label!==null ?workDetail.dependency_label:"Description"} </h6> <h4>{workDetail.dependency_label_text}</h4>
-                              
+                              <h6> {workDetail.dependency_label !== null ? workDetail.dependency_label : "Description"} </h6> <h4>{workDetail.dependency_label_text}</h4>
+
                             </>
                           )}
                         </IonText>
@@ -484,9 +491,9 @@ const TaskPreview: React.FC = () => {
 
           {/* Feedback And Follow-up */}
           <IonCard className="ion-padding-horizontal">
-            <IonText className="previewHeading">
-              <h2>Feedback And Follow-up</h2>
-            </IonText>
+            <IonCardHeader>
+              <IonCardTitle>Feedback And Follow-up</IonCardTitle>
+            </IonCardHeader>
             {formData?.feedback_details &&
               formData.feedback_details.length > 0 &&
               formData.feedback_details.map(
@@ -542,7 +549,7 @@ const TaskPreview: React.FC = () => {
           </IonCard>
         </div>
       </IonContent>
-      <GoTop/>
+      <GoTop />
     </>
   );
 };

@@ -85,7 +85,7 @@ const Notification: React.FC = () => {
     setShowNotification(true);
   };
 
-  const handleDelete = async (index: number, id: number) => {
+  const handleDelete = async (id: number) => {
     try {
       const response = await updateNotificationStatus(id, { read: true });
       console.log("-------------------->", response);
@@ -382,7 +382,7 @@ const Notification: React.FC = () => {
                     slot="end"
                     className="itemBt"
                     shape="round"
-                    onClick={() => handleDelete(index, notification.id)}
+                    onClick={() => handleDelete(notification.id)}
                   >
                     <IonImg src="/assets/images/delete-icon.svg"></IonImg>
                   </IonButton>
@@ -398,7 +398,15 @@ const Notification: React.FC = () => {
         cssClass="viewNotificationAlert"
         header={selectedNotification.title}
         message={selectedNotification.description}
-        buttons={["OK"]}
+        buttons={[
+          {
+            text: 'OK',
+            role: 'confirm',
+            handler: () => {
+              handleDelete(selectedNotification.id);
+            },
+          },
+        ]}
       />
       {/* <IonAlert
         isOpen={showAlert}

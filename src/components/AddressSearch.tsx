@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useField } from 'formik';
 import { IonInput, IonItem } from '@ionic/react';
 
@@ -10,15 +10,14 @@ interface AddressSearchProps {
 const AddressSearch: React.FC<AddressSearchProps> = ({ name, setFieldValue }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [field, meta, helpers] = useField(name);
+  const [restrictions, setRestrictions] = useState({ country: localStorage.getItem('country_code') });
 
   useEffect(() => {
     if (!inputRef.current) return;
-  
+    
     const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
-      types: ['geocode'],
-      componentRestrictions: {
-        country: ['AE']
-      }
+      types: ['geocode', 'establishment'],
+      componentRestrictions: restrictions
     });
   
     autocomplete.addListener('place_changed', () => {

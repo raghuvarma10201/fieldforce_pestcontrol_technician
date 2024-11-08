@@ -8,8 +8,8 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next) // Pass i18n down to react-i18next
   .init({
-    lng: 'en', // default language
-    fallbackLng: 'en',
+    lng: '1', // default language
+    fallbackLng: '1',
     debug: true,
     resources: {}, // Empty initially, we will load it dynamically
     interpolation: {

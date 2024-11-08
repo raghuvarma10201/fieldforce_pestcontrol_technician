@@ -203,7 +203,8 @@ export const stockApproveRejected = async (id: any, status: any, reason: any) =>
     const requestBody = {
       "stock_id": id,
       "status": status,
-      "reason": reason
+      "reason": reason,
+      business_id : await getBusinessId()
     };
     const response = await axiosInstance.post(`${apiUrl}/accept-reject-received-stock`, requestBody);
     console.log(response);

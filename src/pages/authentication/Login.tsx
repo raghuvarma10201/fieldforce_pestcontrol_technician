@@ -95,7 +95,7 @@ const Login: React.FC = () => {
             try {
               await userCheckIns(userData);
               localStorage.setItem("userData", JSON.stringify(userData));
-              
+              localStorage.setItem("country_code", response.data.data.country_code);
               localStorage.setItem("subscription", JSON.stringify(subscription));
               history.push("/dashboard");
 

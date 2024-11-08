@@ -516,10 +516,7 @@ const CreateTask: React.FC = () => {
     console.log("tset");
     try {
       const response = await addCustomer(values);
-      console.log(response);
-      console.log(response.data);
-
-      if (response.data.statusCode == 200 && response.data.status) {
+      if (response.statusCode == 200 && response.status) {
         toast.success("Customer added successfully");
         // Reset form or navigate to another page
         getCustomerList();
@@ -877,9 +874,9 @@ const CreateTask: React.FC = () => {
 
         {treatmentType && !taskForm && (
           <div className="createTask-pestDetails">
-            <h1 className="headingH1 ion-padding-horizontal">Pest Details</h1>
+            <h1 className="headingH1 ion-padding-horizontal">Service Details</h1>
             <IonText className="subHeadingH2">
-              <h2 className="ion-padding-horizontal">Treatment Type</h2>
+              <h2 className="ion-padding-horizontal">Service Name</h2>
             </IonText>
             <div className=" ion-padding-horizontal createTask-pestDetails ionPaddingBottom">
               {treatmentData &&
@@ -903,7 +900,7 @@ const CreateTask: React.FC = () => {
                 ))}
 
               <IonText className="subHeadingH2 ">
-                <h2 className="ion-padding-top">Pests Reported</h2>
+                <h2 className="ion-padding-top">Service Type</h2>
               </IonText>
               {pestsData &&
                 pestsData.length > 0 &&

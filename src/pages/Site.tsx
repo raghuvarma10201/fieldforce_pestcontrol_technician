@@ -33,6 +33,7 @@ const Site: React.FC = () => {
     getCurrentLocation()
       .then((pos) => {
         if (pos) {
+          
           completedTaskData(pos.coords.latitude, pos.coords.longitude)
             .then((response) => {
               if (response && response.success) {

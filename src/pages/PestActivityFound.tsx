@@ -605,7 +605,7 @@ const PestActivityFound: React.FC = () => {
               {/* You can use the appropriate arrow icon */}
             </IonButton>
           </IonButtons>
-          <IonTitle className="ion-float-start">Pest Activity Found</IonTitle>
+          <IonTitle className="ion-float-start">Service Details</IonTitle>
           <div className="ion-float-end headerBts">
             <IonButton shape="round" onClick={navigateToTaskPreview}>
               <IonImg src="/assets/images/preview-icon.svg" />
@@ -644,7 +644,7 @@ const PestActivityFound: React.FC = () => {
                 <IonItem lines="none">
                   <div className="width100">
                     <IonLabel className="ion-label">
-                      Pest Found ?<IonText>*</IonText>
+                      Sercivce Done?<IonText>*</IonText>
                     </IonLabel>
 
                     <IonSelect
@@ -661,7 +661,7 @@ const PestActivityFound: React.FC = () => {
                       {...register("is_pest_found" + index, {
                         required: {
                           value: true,
-                          message: "Pest found is required",
+                          message: "This field is required",
                         },
                       } as any)}
                     >
@@ -679,7 +679,7 @@ const PestActivityFound: React.FC = () => {
                 <IonItem lines="none">
                   <div className="width100">
                     <IonLabel className="ion-label">
-                      Pest Activity Found <IonText>*</IonText>
+                      Service Type <IonText>*</IonText>
                     </IonLabel>
                     <IonSelect
                       value={item.pest_report_type}
@@ -693,7 +693,7 @@ const PestActivityFound: React.FC = () => {
                       {...register("pest_report_type" + index, {
                         required: {
                           value: true,
-                          message: "Pest Activity Found is required",
+                          message: "Service Type is required",
                         },
                       })}
                       // {...setError( "pest_report_type" + index, { type: 'custom', message: 'custom message' })}

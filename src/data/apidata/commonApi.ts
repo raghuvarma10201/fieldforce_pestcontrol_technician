@@ -8,8 +8,8 @@ const apiUrl: any = import.meta.env.VITE_API_URL;
 
 export const appSettings = async (payload: any) => {
   try{
-    const response = await axiosInstance.post(`${apiUrl}/get-settings`, payload);
-    return response;
+    const response = await axios.post(`${apiUrl}/get-settings`, payload);
+    return response.data;
   }
   catch(error){
     console.error(error);

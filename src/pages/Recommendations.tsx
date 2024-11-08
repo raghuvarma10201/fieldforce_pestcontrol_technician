@@ -62,10 +62,6 @@ import { t } from "i18next";
 interface FormData {
   visit_id: string;
   is_recommendation_added: string;
-  pest_reported_id: string;
-  recommendation_id: string;
-  description: string;
-  is_service_available: string;
   recommendations: string;
 }
 
@@ -118,9 +114,7 @@ const Recommendations = () => {
   const [customRecommendations, setCustomRecommendations] = useState({});
   const [selectedOptions, setSelectedOptions] = useState({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [recommDataArray, setRecommDataArray] = useState<RecommendationData[]>(
-    []
-  );
+  const [recommDataArray, setRecommDataArray] = useState<any>({});
   const [imageUploadStatus, setImageUploadStatus] = useState<any[]>([]);
 
   // const [recommTypes, setRecommTypes] = useState<{ recommendation_type_id: string; recommendation_type: string }[]>([]);
@@ -147,10 +141,6 @@ const Recommendations = () => {
   const [formData, setFormData] = useState<Partial<FormData>>({
     visit_id: activeTaskData.id,
     is_recommendation_added: "",
-    pest_reported_id: "",
-    recommendation_id: "",
-    description: "",
-    is_service_available: "",
     recommendations: "",
   });
   console.log(activeTaskData);
@@ -221,21 +211,14 @@ const Recommendations = () => {
   };
 
   const initRecommDataArray = (uniquePestActivityArray: any[]) => {
-    const recommDataArrayTemp = uniquePestActivityArray.map((item: any) => {
-      return {
-        is_recommendation_added: "",
-        pest_reported_id: item.pest_reported_id,
-        recommendation_id: "",
-        description: "",
-        is_service_available: "",
-        recommended_media: [],
-        recommendations: [],
-        selectedRecommendations: [],
-        selectedRecommendationDescriptions: [],
-        selectedRecommendationFiles: [],
+    const recommDataArrayTemp = {
+      is_recommendation_added: "",
+      recommendations: [],
+      selectedRecommendations: [],
+      selectedRecommendationDescriptions: [],
+      selectedRecommendationFiles: [],
 
-      };
-    });
+    };
 
     setRecommDataArray(recommDataArrayTemp);
     setImages(new Array(uniquePestActivityArray.length).fill([]));
@@ -273,52 +256,28 @@ const Recommendations = () => {
     let isValid = true;
 
     console.log("Submitted recommendation data array:", recommendation);
-
-    recommDataArray.forEach((recommItem, index) => {
-      if (!recommItem.is_recommendation_added) {
-        isValid = false;
-        console.log(
-          "Recommendation added status is required for index:",
-          index
-        );
-      }
-
-      if (recommItem.is_recommendation_added === "Yes") {
-        const recommendationTypes = recommItem.selectedRecommendations || [];
-        console.log(
-          `Recommendation types for index ${index}:`,
-          recommendationTypes
-        );
-
-        recomm.forEach((type: any) => {
-          const isFilled = recommendation.recommendations.find((rec: any) => rec.question_id == type.questions.id);
-          console.log(isFilled);
-          if (isFilled) {
-            if ((type.questions.type === 'descriptive' || type.questions.type === 'file') && isFilled.descriptive === '') {
-              isValid = false;
-              return isValid;
-            }
-          } else {
+    if (!recommDataArray.is_recommendation_added) {
+      isValid = false;
+    }
+    if (recommDataArray.is_recommendation_added === "Yes") {
+      const recommendationTypes = recommDataArray.selectedRecommendations || [];
+      recomm.forEach((type: any) => {
+        const isFilled = recommendation.recommendations.find((rec: any) => rec.question_id == type.questions.id);
+        console.log(isFilled);
+        if (isFilled) {
+          if ((type.questions.type === 'descriptive') && isFilled.descriptive === '') {
+            isValid = false;
+            return isValid;
+          }else if ((type.questions.type === 'file') && isFilled.file === '') {
             isValid = false;
             return isValid;
           }
-        })
-      }
-
-      if (!recommItem.is_service_available) {
-        isValid = false;
-        console.log("Service available status is required for index:", index);
-      }
-
-      if (!recommItem.recommended_media?.length) {
-        isValid = false;
-        console.log(
-          "Image capture is required for recommendation at index:",
-          index
-        );
-      }
-    });
-
+        } else {
+          isValid = false;
+          return isValid;
+        }
+      })
+    }
     console.log("Validation result:", isValid);
     return isValid;
   };
@@ -349,6 +308,7 @@ const Recommendations = () => {
           option_id: option_id,
           dependency_label_text: '',
           descriptive: '',
+          file: ''
         });
       }
     });
@@ -357,7 +317,7 @@ const Recommendations = () => {
   };
   const onSubmit = async (data: any) => {
     console.log(recommDataArray);
-    const requestBody: { visit_id: any; is_recommendation_added: any; pest_reported_id: any; is_service_available: any; recommendations: { question_id: any; option_id: any; dependency_label_text: any; descriptive: any; }[]; recommended_media: any; latitude: string | number; longitude: string | number; }[] = [];
+    //const requestBody: { visit_id: any; is_recommendation_added: any; recommendations: { question_id: any; option_id: any; dependency_label_text: any; descriptive: any; file: any; }[]; latitude: string | number; longitude: string | number; }[] = [];
     //const ccc = recommDataArray[0].selectedRecommendations.some((selected: any) =>selected.recommendation_type_id === type.questions.id))
     console.log("Submit data : ", data);
     console.log("recommDataArray ==== ", recommDataArray);
@@ -374,104 +334,74 @@ const Recommendations = () => {
     console.log("visit id from session storage ", visit_id);
     setIsSubmitting(true);
 
-    recommDataArray.forEach((recommItem: any, index: any) => {
-      let mcqData = recommItem.selectedRecommendations?.map((question: any) => {
-        const questionId = question.recommendation_type_id;
-        const answerId = Array.isArray(question.id) ? question.id.join(",") : question.id || "";
-        const dependencyLabelText = question.dependencyLabelText || "";
-        const descriptive = Array.isArray(question.descriptive) ? question.descriptive.join(",") : question.descriptive || "";
-        return {
-          question_id: questionId,
-          option_id: answerId,
-          dependency_label_text: dependencyLabelText,
-          descriptive: descriptive,
-        };
-      });
-      mcqData = groupMcqRecommendations(mcqData);
-      const descriptiveData = recommItem.selectedRecommendationDescriptions?.map((question: any) => {
-        const questionId = question.recommendation_type_id;
-        const answerId = '';
-        const dependencyLabelText = "";
-        const descriptive = question.description;
-        return {
-          question_id: questionId,
-          option_id: answerId,
-          dependency_label_text: dependencyLabelText,
-          descriptive: descriptive,
-        };
-      });
-      const fileData = recommItem.selectedRecommendationFiles?.map((question: any) => {
-        const questionId = question.recommendation_type_id;
-        const answerId = '';
-        const dependencyLabelText = "";
-        const descriptive = question.file;
-        return {
-          question_id: questionId,
-          option_id: answerId,
-          dependency_label_text: dependencyLabelText,
-          descriptive: descriptive,
-        };
-      });
-      console.log(mcqData);
-      console.log(descriptiveData);
-      console.log(fileData);
-      const mergedArray = [...new Set([...(mcqData ?? []), ...(descriptiveData ?? []), ...(fileData ?? [])])];
-      console.log(mergedArray);
-
-      const search = {
-        visit_id: visit_id,
-        is_recommendation_added: recommItem.is_recommendation_added || "",
-        pest_reported_id: recommItem.pest_reported_id,
-        is_service_available: recommItem.is_service_available || "",
-        recommendations: mergedArray,
-        recommended_media: recommItem.recommended_media || [],
-        latitude: location?.latitude || "",
-        longitude: location?.longitude || "",
-      }
-      requestBody.push(search);
+    let mcqData = recommDataArray.selectedRecommendations?.map((question: any) => {
+      const questionId = question.recommendation_type_id;
+      const answerId = Array.isArray(question.id) ? question.id.join(",") : question.id || "";
+      const dependencyLabelText = question.dependencyLabelText || "";
+      const descriptive = Array.isArray(question.descriptive) ? question.descriptive.join(",") : question.descriptive || "";
+      return {
+        question_id: questionId,
+        option_id: answerId,
+        dependency_label_text: dependencyLabelText,
+        descriptive: descriptive,
+        file: ''
+      };
     });
-    console.log(requestBody);
-    //await validateInputs(requestBody[0]);
-
+    
+    //mcqData = groupMcqRecommendations(mcqData);
+    console.log(mcqData);
+    
+    const descriptiveData = recommDataArray.selectedRecommendationDescriptions?.map((question: any) => {
+      const questionId = question.recommendation_type_id;
+      const answerId = '';
+      const dependencyLabelText = "";
+      const descriptive = question.description;
+      return {
+        question_id: questionId,
+        option_id: answerId,
+        dependency_label_text: dependencyLabelText,
+        descriptive: descriptive,
+        file: ''
+      };
+    });
+    const fileData = recommDataArray.selectedRecommendationFiles?.map((question: any) => {
+      const questionId = question.recommendation_type_id;
+      const answerId = '';
+      const dependencyLabelText = "";
+      const descriptive = question.file;
+      return {
+        question_id: questionId,
+        option_id: answerId,
+        dependency_label_text: dependencyLabelText,
+        descriptive: '',
+        file: descriptive
+      };
+    });
+    const mergedArray = [...new Set([...(mcqData ?? []), ...(descriptiveData ?? []), ...(fileData ?? [])])];
+    const requestBody = {
+      visit_id: visit_id,
+      is_recommendation_added: recommDataArray.is_recommendation_added || "",
+      recommendations: mergedArray,
+      latitude: location?.latitude || "",
+      longitude: location?.longitude || "",
+    }
     try {
       // Validate inputs
-      if (!validateInputs(requestBody[0])) {
-        console.error(
-          "Validation failed. Please fill in all the required fields."
-        );
+      if (!validateInputs(requestBody)) {
         setSubmitting(false); // Stop form submission
         toast.error("Please fill all fields")
         return;
       }
-      // Validate each pest entry
-      const isValid = recommDataArray.every(validatePestData);
-      // if (!isValid) {
-      //   console.error("One or more pests have invalid or incomplete data.");
-      //   toast.error("Please fill  all required Issues for each Pest.");
-      //   setSubmitting(false); // Stop form submission
-      //   return;
-      // }
-
       setSubmitting(true);
-      console.log(JSON.stringify(requestBody, null, 2));
-      console.log("Request Body: ", requestBody);
-
       const responseData = await savePestRecommendationBasedOnNetwork(
         location?.latitude?.toString() || "", // Pass latitude as a string
         location?.longitude?.toString() || "", // Pass longitude as a string
         visit_id,
-        requestBody[0]
+        requestBody
       );
-
       // Check the structure of responseData.data
       if (responseData.data) {
         console.log(responseData);
-
-        const requestBodyArray = requestBody;
-        // localStorage.setItem(
-        //   "recommDataArray",
-        //   JSON.stringify(requestBodyArray)
-        // );
         updateTaskStatus("", "recommGiven", ProgressStatus.done);
         history.push("/taskexecution");
       } else if (
@@ -485,6 +415,7 @@ const Recommendations = () => {
         toast.error("Please fill all the Details Correctly. Please try again.");
       }
     } catch (error: any) {
+      console.log(error);
       if (error.message === "Undefined variable: index") {
         updateTaskStatus("", "recommGiven", ProgressStatus.done);
         history.push("/taskexecution");
@@ -497,53 +428,28 @@ const Recommendations = () => {
     }
   };
 
-  const validatePestData = (pestData: any) => {
-    if (pestData.is_recommendation_added === "Yes") {
-      return (
-        pestData.is_recommendation_added &&
-        pestData.pest_reported_id &&
-        pestData.selectedRecommendations?.length > 0
-      );
-    } else if (pestData.is_recommendation_added === "No") {
-      return pestData.is_recommendation_added && pestData.pest_reported_id;
-    }
-    return false; // default case if is_recommendation_added is neither "Yes" nor "No"
-  };
-
   const history = useHistory();
 
-  const onDescChange = (index: number, value: string) => {
-    const updatedRecommDataArray = [...recommDataArray];
-    updatedRecommDataArray[index].description = value;
-    setRecommDataArray(updatedRecommDataArray);
-  };
-
-  const isRecommChanged = (index: any, value: string, pestType: string) => {
-    const updatedRecommDataArray = [...recommDataArray];
-
-    // Ensure the array has an object at the given index
-    if (!updatedRecommDataArray[index]) {
-      updatedRecommDataArray[index] = {
-        is_recommendation_added: "",
-        pest_reported_id: "",
-        recommendation_id: "",
-        description: "",
-        is_service_available: "",
-        recommended_media: [],
-        recommendations: [],
-        selectedRecommendations: [],
-      };
-    }
-
-    updatedRecommDataArray[index].is_recommendation_added = value;
-    if (updatedRecommDataArray[index].is_recommendation_added === "No") {
-      toast.info("no recommendations added for the for " + pestType);
+  const isRecommChanged = (value: string) => {
+    let updatedRecommDataArray: any = {
+      is_recommendation_added: value,
+      recommendations: [],
+      selectedRecommendations: [],
+      selectedRecommendationDescriptions: [],
+      selectedRecommendationFiles: [],
+    };
+    if (updatedRecommDataArray.is_recommendation_added === "No") {
+      toast.info("no recommendations added for the for ");
+    }else{
+      if(recomm.length == 0 ){
+        updatedRecommDataArray.is_recommendation_added == "No"
+        toast.info("No questionnaire configured");
+      }
     }
     setRecommDataArray(updatedRecommDataArray);
   };
 
   const isRecommIdChanged = (
-    index: number,
     selectedIds: string[],
     recommendation_type_id: string
   ) => {
@@ -585,37 +491,20 @@ const Recommendations = () => {
     }
 
 
-    setRecommDataArray((prevState) => {
-      const newState = [...prevState];
+    setRecommDataArray((prevState: any) => {
+      const newState = recommDataArray;
       // Filter out existing recommendations of the same type to avoid duplicates
-      const filteredRecommendations = (
-        newState[index]?.selectedRecommendations || []
-      ).filter((rec) => rec.recommendation_type_id !== recommendation_type_id);
+      const filteredRecommendations = (selectedRecommendations || []).filter((rec: any) => rec.recommendation_type_id !== recommendation_type_id);
 
-      newState[index] = {
-        ...newState[index],
-        selectedRecommendations: [
-          ...filteredRecommendations,
-          ...selectedRecommendations,
-        ],
-      };
+      newState.selectedRecommendations = [
+        ...filteredRecommendations,
+        ...selectedRecommendations,
+      ];
 
       return newState;
     });
-
-    // Update the state for "Others" selections
-    setOthersSelections((prev) => {
-      const updatedOthersSelections = { ...prev };
-      if (!updatedOthersSelections[index]) {
-        updatedOthersSelections[index] = {};
-      }
-      updatedOthersSelections[index][recommendation_type_id] =
-        selectedIds.includes(othersId);
-      return updatedOthersSelections;
-    });
   };
   const isRecommIdChanged2 = (
-    index: number,
     description: string,
     recommendation_type_id: string
   ) => {
@@ -629,90 +518,26 @@ const Recommendations = () => {
       recommendation_type_id: recommendation_type_id,
       description: description,
     }]
-    setRecommDataArray((prevState) => {
-      const newState = [...prevState];
+    setRecommDataArray((prevState: any) => {
+      const newState = recommDataArray;
       // Filter out existing recommendations of the same type to avoid duplicates
       const filteredRecommendations = (
-        newState[index]?.selectedRecommendationDescriptions || []
-      ).filter((rec) => rec.recommendation_type_id !== recommendation_type_id);
+        newState.selectedRecommendationDescriptions || []
+      ).filter((rec: any) => rec.recommendation_type_id !== recommendation_type_id);
 
       console.log(filteredRecommendations);
 
-      newState[index] = {
-        ...newState[index],
-        selectedRecommendationDescriptions: [
-          ...filteredRecommendations,
-          ...selectedDescription,
-        ],
-      };
+      newState.selectedRecommendationDescriptions = [
+        ...filteredRecommendations,
+        ...selectedDescription,
+      ];
       console.log(recommDataArray);
       return newState;
     });
-
-    // Update the state for "Others" selections
-    setOthersSelections((prev) => {
-      const updatedOthersSelections = { ...prev };
-      if (!updatedOthersSelections[index]) {
-        updatedOthersSelections[index] = {};
-      }
-      // updatedOthersSelections[index][recommendation_type_id] =
-      //   selectedIds.includes(othersId);
-      return updatedOthersSelections;
-    });
   };
-  const isServAvailChanged = (index: number, value: string) => {
-    if (index >= 0 && index < recommDataArray.length) {
-      const updatedRecommDataArray = [...recommDataArray];
-      if (updatedRecommDataArray[index]) {
-        updatedRecommDataArray[index].is_service_available = value;
-        setRecommDataArray(updatedRecommDataArray);
-      } else {
-        console.error(`Item at index ${index} is undefined`);
-      }
-    } else {
-      console.error(`Index ${index} is out of bounds`);
-    }
-  };
-
-  const handleReasonChange = (
-    index: number,
-    recommendationTypeId: string,
-    value: string
-  ) => {
-    console.log(
-      `Handling reason change for index: ${index}, recommendationTypeId: ${recommendationTypeId}`
-    );
-    console.log(`New value: ${value}`);
-
-    setCustomDescriptions((prevDescriptions) => {
-      const updatedDescriptions = {
-        ...prevDescriptions,
-        [index]: {
-          ...prevDescriptions[index],
-          [recommendationTypeId]: value,
-        },
-      };
-      console.log("Updated customDescriptions:", updatedDescriptions);
-      return updatedDescriptions;
-    });
-
-    // Check if the value is empty and set error accordingly
-    if (value.trim() === "") {
-      console.log("Description is empty, setting error.");
-      setError(`recommDataArray[${index}].description`, {
-        type: "manual",
-        message: "Description is required for 'Others' selection.",
-      });
-    } else {
-      console.log("Description is valid, clearing error.");
-      clearErrors(`recommDataArray[${index}].description`);
-    }
-  };
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleRecommImageUpload = async (
-    index: number,
     recommendation_type_id: string,
     source: number) => {
     try {
@@ -738,7 +563,7 @@ const Recommendations = () => {
       });
       const imageUrl = "data:image/jpeg;base64," + capturedImage.base64String;
       console.log("Captured image", imageUrl);
-      setImageUploadForIndex(index, true);
+      //setImageUploadForIndex(index, true);
 
       const selectedFile = [{
         recommendation_type_id: recommendation_type_id,
@@ -746,69 +571,21 @@ const Recommendations = () => {
         dependency_label_text: '',
         descriptive: '',
       }]
-      setRecommDataArray((prevState) => {
-        const newState = [...prevState];
-        // Filter out existing recommendations of the same type to avoid duplicates
+      
+      await setRecommDataArray((prevState: any) => {
+        const newState = recommDataArray;
         const filteredRecommendations = (
-          newState[index]?.selectedRecommendationFiles || []
-        ).filter((rec) => rec.recommendation_type_id !== recommendation_type_id);
-
+          newState.selectedRecommendationFiles || []
+        ).filter((rec: any) => rec.recommendation_type_id !== recommendation_type_id);
         console.log(filteredRecommendations);
-
-        newState[index] = {
-          ...newState[index],
-          selectedRecommendationFiles: [
-            ...filteredRecommendations,
-            ...selectedFile,
-          ],
-        };
+        recommDataArray.selectedRecommendationFiles = [
+          ...filteredRecommendations,
+          ...selectedFile,
+        ];
         console.log(recommDataArray);
         return newState;
       });
-
-    } catch (error) {
-      console.error("Error capturing image:", error);
-    }
-  };
-  const handleImageUpload = async (sectionIndex: number) => {
-    try {
-      let src = CameraSource.Prompt;
-      if (Capacitor.getPlatform() === "web") src = CameraSource.Photos;
-
-      const capturedImage = await Camera.getPhoto({
-        quality: 25,
-        allowEditing: false,
-        saveToGallery: false,
-        source: src,
-        direction: CameraDirection.Rear,
-        resultType: CameraResultType.Base64,
-      });
-      const imageUrl = "data:image/jpeg;base64," + capturedImage.base64String;
-      console.log("Captured image", imageUrl);
-      setImageUploadForIndex(sectionIndex, true);
-
-      setTimeout(() => {
-        setImageUploadForIndex(sectionIndex, false);
-      }, 2000);
-
-      setImages((prevImages) => {
-        const newImages = [...prevImages];
-
-        // Ensure the sectionIndex has an array initialized
-        if (!newImages[sectionIndex]) {
-          newImages[sectionIndex] = [];
-        }
-
-        newImages[sectionIndex] = [...newImages[sectionIndex], imageUrl];
-        return newImages;
-      });
-      const updatedRecommDataArray = [...recommDataArray];
-      (
-        updatedRecommDataArray[sectionIndex] as { recommended_media: any[] }
-      ).recommended_media.push({
-        media: imageUrl,
-      });
-      setRecommDataArray(updatedRecommDataArray);
+      console.log(recommDataArray);
     } catch (error) {
       console.error("Error capturing image:", error);
     }
@@ -832,10 +609,6 @@ const Recommendations = () => {
       setFormData({
         visit_id: activeTaskData?.id || "", // Ensure activeTaskData is defined
         is_recommendation_added: "",
-        pest_reported_id: "",
-        recommendation_id: "",
-        description: "",
-        is_service_available: "",
         recommendations: "",
       });
 
@@ -882,375 +655,191 @@ const Recommendations = () => {
         {submittingProgress && <IonProgressBar type="indeterminate" />}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="ionPaddingBottom">
-            {filteredPestActivityArray.map((pest: any, index: number) => (
-              <div className="recWrappBlock" key={index}>
-                <IonList className="recommendationHead ">
-                  <IonItem className="" lines="none" routerLink="/taskdetails">
-                    <div>
-                      <IonText>
-                        <h2>{pest?.pest_report_type}</h2>
-                        <h5>{t('service', 'Service')} {t('activity', 'Activity')}</h5>
-                      </IonText>
+            <div className="recWrappBlock">
+              <IonList className="recommendationHead ">
+                <IonItem className="" lines="none" routerLink="/taskdetails">
+                  <div>
+                    <IonText>
+                      <h5>{t('service', 'Service')} {t('activity', 'Activity')}</h5>
+                    </IonText>
+                  </div>
+                </IonItem>
+                <div className="bottomArrow"></div>
+              </IonList>
+
+              <div className="ion-padding-horizontal ion-margin-bottom">
+                <IonList className="formlist">
+                  <IonItem lines="none">
+                    <div className="width100">
+                      <IonLabel className="ion-label">
+                        Do you want to add {t('recommendations', 'Recommendations')} ?
+                        <IonText>*</IonText>
+                      </IonLabel>
+                      <IonSelect
+                        placeholder="Select"
+
+                        style={{ width: "100%" }}
+                        value={
+                          recommDataArray.is_recommendation_added
+                        }
+                        onIonChange={(e) => {
+                          isRecommChanged(
+                            e.detail.value || "",
+                          );
+                          clearErrors(
+                            `recommDataArray.is_recommendation_added`
+                          );
+                        }}
+                      >
+                        <IonSelectOption value="Yes">Yes</IonSelectOption>
+                        <IonSelectOption value="No">No</IonSelectOption>
+                        <IonSelectOption value="NA">NA</IonSelectOption>
+                      </IonSelect>
                     </div>
                   </IonItem>
-                  <div className="bottomArrow"></div>
-                </IonList>
-
-                <div className="ion-padding-horizontal ion-margin-bottom">
-                  <IonList className="formlist">
-                    <IonItem lines="none">
-                      <div className="width100">
-                        <IonLabel className="ion-label">
-                          Do you want to add {t('recommendations', 'Recommendations')} ?
-                          <IonText>*</IonText>
-                        </IonLabel>
-                        <IonSelect
-                          placeholder="Select"
-
-                          style={{ width: "100%" }}
-                          value={
-                            recommDataArray[index]?.is_recommendation_added
-                          }
-                          onIonChange={(e) => {
-                            isRecommChanged(
-                              index,
-                              e.detail.value || "",
-                              pest?.pest_report_type
-                            );
-                            clearErrors(
-                              `recommDataArray[${index}].is_recommendation_added`
-                            );
-                          }}
-                        >
-                          <IonSelectOption value="Yes">Yes</IonSelectOption>
-                          <IonSelectOption value="No">No</IonSelectOption>
-                          <IonSelectOption value="NA">NA</IonSelectOption>
-                        </IonSelect>
-                      </div>
-                    </IonItem>
-                    {formSubmitted &&
-                      !recommDataArray[index]?.is_recommendation_added && (
-                        <IonText color="danger">
-                          Please select whether you want to add {t('recommendations', 'Recommendations')}
-                          or not
-                        </IonText>
-                      )}
-
-                    {recommDataArray[index]?.is_recommendation_added ===
-                      "Yes" && (
-                        <>
-                          {recomm.map((type, mapIndex) => (
-                            <IonItem
-                              lines="none"
-                              key={type.questions.id}
-                            >
-                              <div className="width100">
-                                <IonLabel className="ion-label">
-                                  {type.questions.question}
-                                  <IonText>*</IonText>
-                                </IonLabel>
-                                {type.questions.type === "descriptive" && (
-                                  <IonTextarea
-                                    aria-label="Reason"
-
-                                    placeholder={type.questions.question}
-                                    value={
-                                      recommDataArray[index]?.selectedRecommendationDescriptions
-                                        ?.filter(
-                                          (selected) =>
-                                            selected.recommendation_type_id === type.questions.id
-                                        )
-                                        .map((selected) => selected.description) // returns an array of descriptions
-                                        .join(', ') || ''  // Join them into a single string, separated by a comma (or use '\n' for new lines)
-                                    }
-                                    onIonInput={(e) => {
-                                      clearErrors(
-                                        `recommDataArray[${index}].recommendation_id`
-                                      );
-                                      const value = e.detail.value as string;
-                                      isRecommIdChanged2(
-                                        index,
-                                        value,
-                                        type.questions.id
-                                      );
-                                    }}
-                                  ></IonTextarea>
-                                )}
-                                {type.questions.type === "mcq" && (
-                                  <IonSelect
-                                    placeholder="Select"
-
-                                    style={{ width: "100%" }}
-                                    multiple={(() => {
-                                      if (type.questions.selection_type === 'single') {
-                                        return false;
-                                      } else {
-                                        return true;
-                                      }
-                                    })()}
-                                    value={
-                                      recommDataArray[
-                                        index
-                                      ]?.selectedRecommendations
-                                        ?.filter(
-                                          (selected) =>
-                                            selected.recommendation_type_id === type.questions.id
-                                        )
-                                        .map((selected) => selected.id) || []
-                                    }
-                                    onIonChange={(e) => {
-                                      clearErrors(
-                                        `recommDataArray[${index}].recommendation_id`
-                                      );
-                                      console.log(e);
-                                      const value = e.detail.value as string[];
-
-                                      isRecommIdChanged(
-                                        index,
-                                        value,
-                                        type.questions.id
-                                      );
-                                    }}
-                                  >
-                                    {type.answers.map((rec: any) => (
-                                      <IonSelectOption key={rec.id} value={rec.id}>
-                                        {rec.options}
-                                      </IonSelectOption>
-                                    ))}
-                                    <IonSelectOption value="Others">
-                                      Others
-                                    </IonSelectOption>
-                                  </IonSelect>
-                                )}
-                                {type.questions.type === "file" && (
-                                  <div>
-                                    <IonCard
-                                      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0px', minHeight: '200px', border: '2px dashed #ccc' }}
-
-                                    >
-                                      {recommDataArray[index]?.selectedRecommendationFiles &&
-                                        recommDataArray[index]?.selectedRecommendationFiles
-                                          ?.filter((selected) => selected.recommendation_type_id === type.questions.id)
-                                          .map((selected) => selected.file)[0] ? (
-                                        <span style={{ width: '100%' }}>
-                                          <img src={recommDataArray[index]?.selectedRecommendationFiles &&
-                                            recommDataArray[index]?.selectedRecommendationFiles
-                                              ?.filter((selected) => selected.recommendation_type_id === type.questions.id)
-                                              .map((selected) => selected.file)[0]} alt="Uploaded" style={{ width: '100%', height: 'auto', maxHeight: '200px' }} />
-                                          <IonIcon className="updateImage" icon={camera} onClick={() => handleRecommImageUpload(index, type.questions.id, type.questions.source)}/>
-                                        </span>
-
-
-                                      ) : (
-                                        <div style={{ textAlign: 'center' }}>
-                                          <IonIcon icon={camera} style={{ fontSize: '48px', color: '#888' }} />
-
-                                          {type.questions.source == 1 && (<p>Capture an image, or click the camera to capture one</p>)}
-                                          {type.questions.source == 2 && (<p>Upload an image here, or click below to upload</p>)}
-                                          {type.questions.source == 3 && (<p>Capture/Upload an image here, or click the camera to capture one</p>)}
-                                          <IonButton onClick={() => handleRecommImageUpload(index, type.questions.id, type.questions.source)}>
-                                            <IonIcon slot="start" icon={camera} />
-                                            {type.questions.source == 1 && ('Capture')}
-                                            {type.questions.source == 2 && ('Upload')}
-                                            {type.questions.source == 3 && ('Capture/Upload')}
-                                          </IonButton>
-                                        </div>
-                                      )}
-                                    </IonCard>
-                                    {/* <IonCard
-                                      className="ion-button"
-                                      color="medium"
-                                      onClick={() => handleRecommImageUpload(index, type.questions.id, type.questions.source)}>
-                                      {type.questions.source == 1 && ('Capture')}
-                                      {type.questions.source == 2 && ('Upload')}
-                                      {type.questions.source == 3 && ('Capture/Upload')}
-                                    </IonCard> */}
-                                    {/* {recommDataArray[index]?.selectedRecommendationFiles &&
-                                              recommDataArray[index]?.selectedRecommendationFiles
-                                                ?.filter((selected) => selected.recommendation_type_id === type.questions.id)
-                                                .map((selected) => selected.file)[0] && (
-
-                                      <IonItem lines="none">
-                                        <div >
-                                          <img
-                                            className="width100"
-                                            src={recommDataArray[index]?.selectedRecommendationFiles &&
-                                              recommDataArray[index]?.selectedRecommendationFiles
-                                                ?.filter((selected) => selected.recommendation_type_id === type.questions.id)
-                                                .map((selected) => selected.file)[0] || ''  // Take the first image, or provide an empty string
-                                            }
-                                            alt="Recommendation Image"
-                                          />
-                                        </div>
-                                      </IonItem>
-                                    )} */}
-                                  </div>
-
-                                )}
-                                {formSubmitted &&
-                                  ((!recommDataArray[index]?.selectedRecommendations || !recommDataArray[index].selectedRecommendations.some((selected: any) => selected.recommendation_type_id === type.questions.id)) &&
-
-                                    (!recommDataArray[index]?.selectedRecommendationDescriptions || !recommDataArray[index].selectedRecommendationDescriptions.some((selected: any) => selected.recommendation_type_id === type.questions.id)) &&
-
-                                    (!recommDataArray[index]?.selectedRecommendationFiles || !recommDataArray[index].selectedRecommendationFiles.some((selected: any) => selected.recommendation_type_id === type.questions.id))) && (
-
-                                    <IonText color="danger">
-                                      This field is required.
-                                    </IonText>
-                                  )}
-
-                                {othersSelections[index]?.[
-                                  type.recommendation_type_id
-                                ] && (
-                                    <IonItem lines="none">
-                                      <div className="width100">
-                                        <IonLabel className="ion-label">
-                                          Description<IonText>*</IonText>
-                                        </IonLabel>
-                                        <IonTextarea
-                                          aria-label="Reason"
-
-                                          placeholder="Enter reason"
-                                          value={
-                                            customDescriptions[index]?.[
-                                            type.recommendation_type_id
-                                            ] || ""
-                                          }
-                                          onIonInput={(e) => {
-                                            console.log(
-                                              `User is typing in description for index: ${index}, recommendationTypeId: ${type.recommendation_type_id}`
-                                            );
-                                            clearErrors(
-                                              `customDescriptions[${index}].${type.recommendation_type_id}`
-                                            );
-                                            handleReasonChange(
-                                              index,
-                                              type.recommendation_type_id,
-                                              e.detail.value || ""
-                                            );
-                                          }}
-                                        ></IonTextarea>
-                                        {formSubmitted &&
-                                          !customDescriptions[index]?.[
-                                          type.recommendation_type_id
-                                          ] && (
-                                            <IonText color="danger">
-                                              Description is required for 'Others'
-                                              selection.
-                                            </IonText>
-                                          )}
-                                      </div>
-                                    </IonItem>
-                                  )}
-                              </div>
-                            </IonItem>
-                          ))}
-                        </>
-                      )}
-
-                    <IonItem lines="none">
-                      <div className="width100">
-                        <IonLabel className="ion-label">
-                          PSD able to Provide Service? <IonText>*</IonText>
-                        </IonLabel>
-                        <IonSelect
-                          placeholder="Select"
-
-                          style={{ width: "100%" }}
-                          value={recommDataArray[index]?.is_service_available}
-                          onIonChange={(e) => {
-                            isServAvailChanged(index, e.detail.value || "");
-                            clearErrors(
-                              `recommDataArray[${index}].is_service_available`
-                            );
-                          }}
-                        >
-                          <IonSelectOption value="Yes">Yes</IonSelectOption>
-                          <IonSelectOption value="No">No</IonSelectOption>
-                          <IonSelectOption value="NA">NA</IonSelectOption>
-                        </IonSelect>
-                      </div>
-                    </IonItem>
-                    {formSubmitted &&
-                      !recommDataArray[index]?.is_service_available && (
-                        <IonText color="danger">
-                          Please select PSD able to Provide Service requirement
-                        </IonText>
-                      )}
-
-                    <IonItem lines="none">
-                      <div>
-                        <IonButton
-                          className="ion-button"
-                          disabled={images[index]?.length >= 3}
-                          fill="solid"
-                          color="medium"
-                          onClick={() => handleImageUpload(index)}
-                        >
-                          Capture Image
-                        </IonButton>
-                        {formSubmitted &&
-                          !recommDataArray[index]?.recommended_media
-                            ?.length && (
-                            <IonText color="danger">
-                              Please capture an image for this recommendation
-                            </IonText>
-                          )}
-                      </div>
-                    </IonItem>
-
-                    {images[index]?.length >= 3 && (
-                      <IonText style={{ color: "#54B4D3" }}>
-                        You cannot capture more than 3 images.
+                  {formSubmitted &&
+                    !recommDataArray.is_recommendation_added && (
+                      <IonText color="danger">
+                        Please select whether you want to add {t('recommendations', 'Recommendations')}
+                        or not
                       </IonText>
                     )}
 
-                    {images[index] && images[index].length > 0 && (
-                      <IonItem lines="none">
-                        <div id="splide" className="splide">
-                          <div className="splide__track">
-                            <Splide options={{ perPage: 1, pagination: false }}>
-                              {images[index].map((image, imageIndex) => (
-                                <SplideSlide key={imageIndex}>
-                                  <img
-                                    src={image}
-                                    alt={`Uploaded Slide ${imageIndex}`}
-                                  />
-                                  {imageUploadStatus[index] && (
-                                    <div className="absolute-center">
-                                      {/* <IonLabel>image Uploading</IonLabel> */}
-                                      <IonSpinner name="dots" />
-                                    </div>
-                                  )}
-                                  <div
-                                    slot="center"
-                                    className="del"
-                                    title="Delete"
-                                  >
-                                    <p
-                                      onClick={() =>
-                                        handleRemoveImage(index, imageIndex)
-                                      } // Ensure correct parameters
-                                      style={{
-                                        width: "50%",
-                                        margin: "10px auto",
-                                      }}
-                                    >
-                                      &times;
-                                    </p>
-                                  </div>
-                                </SplideSlide>
-                              ))}
-                            </Splide>
-                          </div>
-                        </div>
-                      </IonItem>
-                    )}
-                  </IonList>
-                </div>
-              </div>
-            ))}
+                  {recommDataArray.is_recommendation_added ===
+                    "Yes" && (
+                      <>
+                        {recomm.map((type, mapIndex) => (
+                          <IonItem
+                            lines="none"
+                            key={type.questions.id}
+                          >
+                            <div className="width100">
+                              <IonLabel className="ion-label">
+                                {type.questions.question}
+                                <IonText>*</IonText>
+                              </IonLabel>
+                              {type.questions.type === "descriptive" && (
+                                <IonTextarea
+                                  aria-label="Reason"
 
+                                  placeholder={type.questions.question}
+                                  value={
+                                    recommDataArray.selectedRecommendationDescriptions
+                                      ?.filter(
+                                        (selected: any) =>
+                                          selected.recommendation_type_id === type.questions.id
+                                      )
+                                      .map((selected: any) => selected.description) // returns an array of descriptions
+                                      .join(', ') || ''  // Join them into a single string, separated by a comma (or use '\n' for new lines)
+                                  }
+                                  onIonInput={(e) => {
+                                    clearErrors(
+                                      `recommDataArray.recommendation_id`
+                                    );
+                                    const value = e.detail.value as string;
+                                    isRecommIdChanged2(
+                                      value,
+                                      type.questions.id
+                                    );
+                                  }}
+                                ></IonTextarea>
+                              )}
+                              {type.questions.type === "mcq" && (
+                                <IonSelect
+                                  placeholder="Select"
+
+                                  style={{ width: "100%" }}
+                                  multiple={(() => {
+                                    if (type.questions.selection_type === 'single') {
+                                      return false;
+                                    } else {
+                                      return true;
+                                    }
+                                  })()}
+                                  value={
+                                    recommDataArray.selectedRecommendations
+                                      ?.filter(
+                                        (selected: any) =>
+                                          selected.recommendation_type_id === type.questions.id
+                                      )
+                                      .map((selected: any) => selected.id) || []
+                                  }
+                                  onIonChange={(e) => {
+                                    clearErrors(
+                                      `recommDataArray.recommendation_id`
+                                    );
+                                    console.log(e);
+                                    const value = e.detail.value as string[];
+
+                                    isRecommIdChanged(
+                                      value,
+                                      type.questions.id
+                                    );
+                                  }}
+                                >
+                                  {type.answers.map((rec: any) => (
+                                    <IonSelectOption key={rec.id} value={rec.id}>
+                                      {rec.options}
+                                    </IonSelectOption>
+                                  ))}
+                                  <IonSelectOption value="Others">
+                                    Others
+                                  </IonSelectOption>
+                                </IonSelect>
+                              )}
+                              {type.questions.type === "file" && (
+                                <div>
+                                  <IonCard
+                                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '0px', minHeight: '200px', border: '2px dashed #ccc' }}>
+                                    {recommDataArray.selectedRecommendationFiles &&
+                                      recommDataArray.selectedRecommendationFiles
+                                        ?.filter((selected: any) => selected.recommendation_type_id === type.questions.id)
+                                        .map((selected: any) => selected.file)[0] ? (
+                                      <span style={{ width: '100%' }}>
+                                        <img src={recommDataArray.selectedRecommendationFiles &&
+                                          recommDataArray.selectedRecommendationFiles
+                                            ?.filter((selected: any) => selected.recommendation_type_id === type.questions.id)
+                                            .map((selected: any) => selected.file)[0]} alt="Uploaded" style={{ width: '100%', height: 'auto', maxHeight: '200px' }} />
+                                        <IonIcon className="updateImage" icon={camera} onClick={() => handleRecommImageUpload(type.questions.id, type.questions.source)} />
+                                      </span>
+                                    ) : (
+                                      <div style={{ textAlign: 'center' }}>
+                                        <IonIcon icon={camera} style={{ fontSize: '48px', color: '#888' }} />
+
+                                        {type.questions.source == 1 && (<p>Capture an image, or click the camera to capture one</p>)}
+                                        {type.questions.source == 2 && (<p>Upload an image here, or click below to upload</p>)}
+                                        {type.questions.source == 3 && (<p>Capture/Upload an image here, or click the camera to capture one</p>)}
+                                        <IonButton onClick={() => handleRecommImageUpload(type.questions.id, type.questions.source)}>
+                                          <IonIcon slot="start" icon={camera} />
+                                          {type.questions.source == 1 && ('Capture')}
+                                          {type.questions.source == 2 && ('Upload')}
+                                          {type.questions.source == 3 && ('Capture/Upload')}
+                                        </IonButton>
+                                      </div>
+                                    )}
+                                  </IonCard>
+                                </div>
+
+                              )}
+                              {formSubmitted &&
+                                ((!recommDataArray.selectedRecommendations || !recommDataArray.selectedRecommendations.some((selected: any) => selected.recommendation_type_id === type.questions.id)) &&
+
+                                  (!recommDataArray.selectedRecommendationDescriptions || !recommDataArray.selectedRecommendationDescriptions.some((selected: any) => selected.recommendation_type_id === type.questions.id)) &&
+
+                                  (!recommDataArray.selectedRecommendationFiles || !recommDataArray.selectedRecommendationFiles.some((selected: any) => selected.recommendation_type_id === type.questions.id))) && (
+
+                                  <IonText color="danger">
+                                    This field is required.
+                                  </IonText>
+                                )}
+                            </div>
+                          </IonItem>
+                        ))}
+                      </>
+                    )}
+                </IonList>
+              </div>
+            </div>
             <IonFooter className="ion-footer">
               <IonToolbar className="ionFooterTwoButtons">
                 <IonButton

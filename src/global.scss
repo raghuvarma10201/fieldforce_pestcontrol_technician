@@ -1252,7 +1252,7 @@ ion-card.logOutCard {
         --padding-end: 0px;
         --inner-padding-end: 0px;
         --background: transparent;
-        margin-bottom: 20px;
+        margin-bottom: 0px;
     }
 
     ion-input {
@@ -1279,7 +1279,8 @@ ion-card.logOutCard {
     }
 
     .ion-label {
-        margin-bottom: 3px;
+        margin-bottom: 5px;
+        margin-top: 10px;
         font-weight: 500;
         font-size: 0.86rem;
         --color: #6C6C6C;
@@ -2200,8 +2201,11 @@ ion-card.logOutCard {
     }
 
     p {
+        padding: 5px 10px;
+        font-weight: bold;
         span {
             font-weight: 500;
+            float: right;
             color: var(--ion-color-dark);
         }
     }
@@ -2258,6 +2262,7 @@ ion-card.logOutCard {
 
     .siteName {
         h3 {
+            padding: 5px 10px;
             margin-top: 6px;
             color: #3b3b3b;
             font-size: 0.84rem;
@@ -2267,12 +2272,30 @@ ion-card.logOutCard {
     }
 
     ion-card {
-        padding: 15px 15px;
-        margin-left: 0px;
-        margin-right: 0px;
-        box-shadow: none;
-        background: transparent;
-
+        padding: 0px 0px;
+        box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgb(209, 213, 219) 0px 0px 0px 1px inset;
+        background: #fff;
+        ion-card-header{
+            background-color: var(--ion-color-secondary); /* Example: Facebook blue color */
+            color: white; /* White text for contrast */
+            padding: 16px; /* Padding for spacing */
+            border-radius: 10px 10px 0 0; /* Rounded corners at the top */
+            ion-card-title{
+                color: #fff;
+                float: left;
+                font-size: 0.9rem;
+                font-weight: 600;
+                margin: 0px;
+            }
+        }
+        ion-list{
+            padding: 5px 10px;
+        }
+    }
+    ion-card.innerCard{
+        margin: 10px 10px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        padding: 5px 10px;
     }
 
     ion-card.cardColorDark {
@@ -3569,10 +3592,6 @@ ion-item-group.sigIonGroup {
         ion-card {
             padding-bottom: 0px;
             padding-top: 0px;
-
-            ion-card {
-                background: #fef5f1;
-            }
         }
 
         .list-ios {
@@ -3582,7 +3601,8 @@ ion-item-group.sigIonGroup {
 
     }
 }
-.updateImage{
+
+.updateImage {
     position: absolute;
     top: 10px;
     right: 10px;

@@ -1108,9 +1108,6 @@ export const saveRecommendationsDataToApi = async (
     longitude: longitude,
     recommendations: recommDataArray.recommendations || [],
     is_recommendation_added: recommDataArray.is_recommendation_added || "",
-    pest_reported_id: recommDataArray.pest_reported_id || 0,
-    is_service_available: recommDataArray.is_service_available || "",
-    recommended_media: recommDataArray.recommended_media || [],
   };
 
   try {

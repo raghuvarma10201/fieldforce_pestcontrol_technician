@@ -89,6 +89,7 @@ import { Plugins } from "@capacitor/core";
 import { appSettings, getLanguageFile } from "./data/apidata/commonApi";
 import AppUpdate from "./components/AppUpdate";
 import axiosInstance from "./components/ApiInterceptor";
+import { LoadScript } from "@react-google-maps/api";
 const { Filesystem } = Plugins;
 const apiUrl: any = import.meta.env.VITE_API_URL;
 const isProd: any = import.meta.env.PROD;
@@ -109,13 +110,15 @@ const App: React.FC = () => {
   const [position, setPosition] = useState<any>();
   const [appInfo, setAppInfo] = useState<any>([]);
   const [appVersion, setAppVersion] = useState<string>('');
+  const [googleApiKey,setGoogleApiKey] = useState<string>(localStorage.getItem('google_map_api_key') || '');
   const history = useHistory();
   const { logout } = useAuth();
+  const libraries = ['places', 'geometry'];
 
   useEffect(() => {
-    localStorage.setItem('app_name', 'pest_control');
+    localStorage.setItem('app_name', 'fieldforce_technician');
     Device.getLanguageCode().then(async (lang) => {
-      const languageCode = localStorage.getItem('language') || 'en'; // Extract language code from locale
+      const languageCode = localStorage.getItem('language') || '1'; // Extract language code from locale
       i18n.changeLanguage(languageCode);
       const translations = await fetchTranslations(languageCode);
       i18n.addResourceBundle(languageCode, 'translation', translations);
@@ -236,14 +239,15 @@ const App: React.FC = () => {
 
   async function handlePlatform() {
     try {
-      const payload = { "type": "SETTINGS" }
+      const payload = { "business_id" : 0 }
       const AppSettings = await appSettings(payload);
       console.log(AppSettings);
-      if (AppSettings && AppSettings.data.success) {
-        const GoogleKey = AppSettings.data.data.find((setting: any) => setting.title === "Google_Map_API_Key");
+      if (AppSettings && AppSettings.success) {
+        const GoogleKey = AppSettings.data.google_map_api_key;
         console.log(GoogleKey);
         if (GoogleKey) {
-          localStorage.setItem('Google_Map_API_Key', GoogleKey.description);
+          localStorage.setItem('google_map_api_key', GoogleKey);
+          setGoogleApiKey(GoogleKey);
         }
       }
       const info = await Device.getInfo();
@@ -270,6 +274,7 @@ const App: React.FC = () => {
   }
   return (
     <IonApp>
+      <LoadScript googleMapsApiKey={googleApiKey} libraries={libraries}>
       <NetworkStatus />
       <ToastContainer />
       <AuthProvider>
@@ -304,6 +309,7 @@ const App: React.FC = () => {
               <AuthGuard path="/chemicaluseddetails" component={ChemicalUsedDetails} />
               <AuthGuard path="/workdonedetails" component={WorkDoneDetails} />
               <AuthGuard path="/feedbackfollowup" component={FeedbackFollowup} />
+              <AuthGuard path="/site" component={Site} />
               <AuthGuard path="/siteviewlocation/:taskId" component={SiteViewLocation} />
               <AuthGuard path="/notification" component={Notification} />
               <AuthGuard path="/preview" component={Preview} />
@@ -321,6 +327,7 @@ const App: React.FC = () => {
           </IonRouterOutlet>
         </IonReactRouter>
       </AuthProvider>
+      </LoadScript>
     </IonApp>
   );
 };

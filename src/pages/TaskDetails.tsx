@@ -282,7 +282,15 @@ const TaskDetails: React.FC = () => {
           console.log("API Response:", response.data); // Print the response in the console
           if (response.is_chemicals_required) {
             setShowAlert(true);
-            //history.push("/taskexecution");
+          } else {
+            setLoading(false);
+            history.push("/taskexecution");
+          }
+        }else if(response[0]?.success){
+          const progressStatus: TaskProgress = setStartStatus("" + taskId);
+          console.log("API Response:", response[0].data); // Print the response in the console
+          if (response[0].is_chemicals_required) {
+            setShowAlert(true);
           } else {
             setLoading(false);
             history.push("/taskexecution");

@@ -34,26 +34,18 @@ const SiteViewLocation: React.FC = () => {
     []
   );
 
-  const apiKey = "AIzaSyDY_mNvqPbcGCRiwor1IVcJ5pyRmstm9XY"; // Update with your API key
+
   let taskId = "";
 
   const goBack = () => {
     history.goBack();
   };
-
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: apiKey,
-    libraries: ["places"],
-  });
-
   const calculateRoute = useCallback(
     async (
       fromPos: { lat: number; lng: number },
       toPos: { lat: number; lng: number },
       waypoints: google.maps.DirectionsWaypoint[] = []
     ) => {
-      if (!isLoaded) return;
-
       const directionsService = new google.maps.DirectionsService();
       const request = {
         origin: new google.maps.LatLng(fromPos.lat, fromPos.lng),
@@ -117,15 +109,13 @@ const SiteViewLocation: React.FC = () => {
         }
       });
     },
-    [isLoaded]
+    []
   );
 
   useEffect(() => {
     loadTaskFromParams();
-    if (isLoaded) {
-      fetchData();
-    }
-  }, [isLoaded]);
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -227,7 +217,7 @@ const SiteViewLocation: React.FC = () => {
       />
       <IonContent fullscreen className="ionContentColor">
         <div className="ion-padding-horizontal">
-          {isLoaded && startPosition && (
+          {startPosition && (
             <div
               style={{ width: "100%", height: "400px", touchAction: "none" }}
               className="map-container"
@@ -242,11 +232,6 @@ const SiteViewLocation: React.FC = () => {
                 {toPosition && <Marker position={toPosition} label="End" />}
                 {directions && <DirectionsRenderer directions={directions} />}
               </GoogleMap>
-            </div>
-          )}
-          {!isLoaded && (
-            <div className="alert-message">
-              <p>Google Map failed to load.</p>
             </div>
           )}
         </div>

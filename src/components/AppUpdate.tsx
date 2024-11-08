@@ -25,46 +25,47 @@ const AppUpdate: React.FC = () => {
         try {
             const info = await Device.getInfo();
             const platform = info.platform;
-            const payload = {"type":"SETTINGS"}
-            // const AppSettings = await appSettings(payload);
-            // console.log(AppSettings);
-            // console.log(platform);
-            // if (AppSettings && AppSettings.data.success) {
-            //     if (platform === 'ios' || platform === 'android') {
-            //         console.log('Running on Device');
-            //         const appInfos = await App.getInfo();
-            //         localStorage.setItem('app_version', appInfos.version);
-            //         if (platform === 'android') {
-            //             const AndroidVersion = AppSettings.data.data.find((setting: any) => setting.title === "Mosquito_Control_Android_Version");
-            //             console.log(AndroidVersion);
-            //             if (AndroidVersion.description > appInfos.version) {
-            //                 const appLink = AppSettings.data.data.find((setting: any) => setting.title === "Mosquito_Control_Android_App_link");
-            //                 setUpdateLink(appLink.description);
-            //                 setUpdateAvailable(true);
-            //             }else{
-            //                 setUpdateAvailable(false);
-            //             }
-            //         }
-            //         if (platform === 'ios') {
-            //             const IosVersion = AppSettings.data.data.find((setting: any) => setting.title === "Mosquito_Control_IOS_Version");
-            //             console.log(IosVersion);
-            //             if (IosVersion.description > appInfos.version) {
-            //                 const appLink = AppSettings.data.data.find((setting: any) => setting.title === "Mosquito_Control_IOS_App_link");
-            //                 setUpdateLink(appLink.description);
-            //                 setUpdateAvailable(true);
-            //             }else{
-            //                 setUpdateAvailable(false);
-            //             }
-            //         }
+            const payload = {"business_id" : 0 }
+            const AppSettings : any = await appSettings(payload);
+            console.log(AppSettings);
+            console.log(platform);
+            if (AppSettings && AppSettings.success) {
+                
+                if (platform === 'ios' || platform === 'android' ) {
+                    console.log('Running on Device');
+                    const appInfos = await App.getInfo();
+                    localStorage.setItem('app_version', appInfos.version);
+                    if (platform === 'android') {
+                        const AndroidVersion = AppSettings.data.android_version;
+                        console.log(AndroidVersion);
+                        if (AndroidVersion > appInfos.version) {
+                            const appLink = AppSettings.data.playstore_link;
+                            setUpdateLink(appLink);
+                            setUpdateAvailable(true);
+                        }else{
+                            setUpdateAvailable(false);
+                        }
+                    }
+                    if (platform === 'ios') {
+                        const IosVersion = AppSettings.data.ios_version;
+                        console.log(IosVersion);
+                        if (IosVersion > appInfos.version) {
+                            const appLink = AppSettings.data.appstore_link;
+                            setUpdateLink(appLink);
+                            setUpdateAvailable(true);
+                        }else{
+                            setUpdateAvailable(false);
+                        }
+                    }
 
-            //     } else {
-            //         console.log('Running on Web');
-            //         localStorage.setItem('app_version', 'web');
-            //     }
-            // } else {
-            //     console.error("Failed to fetch app settings", AppSettings);
-            //     //toast.error("Server not responding. Please try again later.");
-            // }
+                } else {
+                    console.log('Running on Web');
+                    localStorage.setItem('app_version', 'web');
+                }
+            } else {
+                console.error("Failed to fetch app settings", AppSettings);
+                //toast.error("Server not responding. Please try again later.");
+            }
 
 
         } catch (error) {
@@ -74,7 +75,14 @@ const AppUpdate: React.FC = () => {
         }
     };
     const updateApp = async () => {
+        const keysToKeep = ['device_token', 'rememberedUserName', 'rememberedPassword','app_name','app_version'];
+        const savedValues = keysToKeep.map(key => ({ key, value: localStorage.getItem(key) }));
         localStorage.clear();
+        savedValues.forEach(({ key, value }) => {
+            if (value !== null) {
+            localStorage.setItem(key, value);
+            }
+        });
         window.open(updateLink, '_blank');
     };
     
