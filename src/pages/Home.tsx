@@ -102,6 +102,7 @@ const Home: React.FC = () => {
       console.error("Error during check-in:", error);
       setError("An unexpected error occurred");
       toast.error('Server not responding. Please try again later.');
+      setLoading(false);
     }
   };
 

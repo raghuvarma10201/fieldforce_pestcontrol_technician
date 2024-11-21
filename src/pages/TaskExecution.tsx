@@ -719,7 +719,6 @@ const TaskExecution: React.FC = () => {
                       : "card"
               }
               onClick={() => {
-                console.log("onClick triggered for PestActivityFound");
                 if (isPaused) {
                   toast.info("Please resume the task to perform the action");
                 } else if (
@@ -727,7 +726,7 @@ const TaskExecution: React.FC = () => {
                     (pest: Pest) => pest.is_chemical_added === null
                   )
                 ) {
-                  toast.info("Please add chemicals for previous pest found");
+                  toast.info("Please add materials for previous service found");
                 } else if (
                   taskProgress?.travelStart === ProgressStatus.done &&
                   taskProgress?.travelEnd === ProgressStatus.done &&
@@ -742,7 +741,7 @@ const TaskExecution: React.FC = () => {
               }}
               >
               <h3>Service Activity Found Details</h3>
-              <h6>House Flies, House Mice</h6>
+              {/* <h6>House Flies, House Mice</h6> */}
             </IonCard>
 
             <IonCard
@@ -780,8 +779,8 @@ const TaskExecution: React.FC = () => {
                 }
               }}
               >
-              <h3>Chemical Used</h3>
-              <h6>Advion Ant Gel, Ant Bait Station … View Details</h6>
+              <h3>MAterial Used</h3>
+              {/* <h6>Advion Ant Gel, Ant Bait Station … View Details</h6> */}
             </IonCard>
 
             <IonCard
@@ -798,7 +797,7 @@ const TaskExecution: React.FC = () => {
                   toast.info("Please resume the task to perform the action");
                 } else if (visitExecutionDetails?.pests_found?.length === 0) {
                   toast.info(
-                    "No pests found. Please add pests before proceeding to Recommendations."
+                    "No service found. Please add service before proceeding to Recommendations."
                   );
                 } else if (
                   visitExecutionDetails.pests_found.some(
@@ -806,7 +805,7 @@ const TaskExecution: React.FC = () => {
                   )
                 ) {
                   toast.info(
-                    "Please add chemicals for pests before proceeding to Recommendations."
+                    "Please add materials for service before proceeding to Recommendations."
                   );
                 } else if (
                   taskProgress?.pestActivityDiscov === ProgressStatus.done &&

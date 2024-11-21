@@ -51,6 +51,7 @@ import {
   retrieveNetworkTasksExecutionDetails,
 } from "../data/offline/entity/DataRetriever";
 import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 interface UsageItem {
   service_id: string;
   item_id: string;
@@ -71,6 +72,7 @@ type ValidationErrorsType = {
 };
 type Id = string | number;
 const ChemicalUsed = () => {
+  const { t } = useTranslation();
   const history = useHistory();
   const [visitExecutionDetails, setVisitExecutionDetails] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -489,10 +491,6 @@ const ChemicalUsed = () => {
     }
   };
 
-  // // update status and Navigate to the taskexecution page
-  // updateTaskStatus("", "chemicalsUsed", ProgressStatus.done);
-  // history.push("/taskexecution");
-
   const checkQuantityInVolume =(pestFoundArray : any,pest_index: any,chemical_index: any,quantity : any,chemical : any) =>{
     // console.log(pestFoundArray+'======='+pest_index+'========'+chemical_index+'======='+quantity);
     // console.log(pest_index);
@@ -828,7 +826,7 @@ const ChemicalUsed = () => {
             </IonButton>
           </IonButtons>
 
-          <IonTitle className="ion-float-start">Chemical Used</IonTitle>
+          <IonTitle className="ion-float-start">{t('material','Material')} Used</IonTitle>
 
           <div className="ion-float-end headerBts">
             <IonButton
@@ -877,7 +875,7 @@ const ChemicalUsed = () => {
 
                 <div className="accContent" slot="content">
                   <IonLabel className="ion-label">
-                    Do u want to add Chemicals? <IonText>*</IonText>
+                    Do u want to add {t('material','Material')}? <IonText>*</IonText>
                   </IonLabel>
 
                   {selectedOptions[index] === "Yes" ? (

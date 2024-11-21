@@ -47,6 +47,7 @@ import AddressSearch from "../components/AddressSearch";
 import "./CreateTask.css";
 
 import CustomerTypeahead from "../components/Typeahead"
+import { useAuth } from "../components/AuthContext";
 
 const CreateTask: React.FC = () => {
   const history = useHistory();
@@ -67,7 +68,7 @@ const CreateTask: React.FC = () => {
   const [customerTypeDetails, setCustomerTypeDetails] = useState<any[]>([]);
   const [areasDetails, setAreasDetails] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const business_shortcode = localStorage.getItem("business_shortcode");
   const generateRandomNumber = () => {
     const now = new Date();
     const year = now.getFullYear().toString().slice(-2);
@@ -78,7 +79,7 @@ const CreateTask: React.FC = () => {
     const seconds = now.getSeconds().toString().padStart(2, "0");
     const milliseconds = now.getMilliseconds().toString().padStart(3, "0");
 
-    return `PCS${year}${month}${day}${hours}${minutes}${seconds}`;
+    return `${business_shortcode}${year}${month}${day}${hours}${minutes}${seconds}`;
   };
 
   const [formData, setFormData] = useState({
@@ -174,6 +175,10 @@ const CreateTask: React.FC = () => {
       .then((response) => {
         if (response && response.success) {
           const pestsDetails = response.data;
+          if(pestsDetails.length == 0){
+            toast.info('Services are not configured.Please select other service');
+            setFormData((prev) => ({ ...prev, service_id: "" }));
+          }
           setPestsData(pestsDetails);
         } else {
           console.error("Failed to fetch pests data. Error:", response);
